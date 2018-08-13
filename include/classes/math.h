@@ -12,14 +12,16 @@ namespace qsim {
         };
 
         class Matrix {
+            private:
+                std::vector<std::vector<std::complex<double>>> data;
+                std::vector<std::vector<std::complex<double>>>::size_type ySize;
+                std::vector<std::complex<double>>::size_type xSize;
+
             public:
-                std::vector<std::vector <std::complex <double> > > data;
-                std::vector<std::vector <std::complex <double> > >::size_type ySize;
-                std::vector<std::complex <double> >::size_type xSize;
 
-                Matrix() {
 
-                };
+                Matrix() {};
+
 
                 Matrix(std::initializer_list<std::vector <std::complex <double> > > d) : data(d) {
                     ySize = data.size();
@@ -39,6 +41,27 @@ namespace qsim {
                     ySize = m;
                     data.resize(ySize, std::vector<std::complex <double> >(xSize));
                 };
+                
+                void setValue(unsigned int y, unsigned int x, const std::complex<double> value) {
+                    data[y][x] = value;
+                };
+
+                std::vector<std::vector<std::complex<double>>>::size_type getYSize() const {
+                    return ySize;
+                };
+
+                std::vector<std::complex<double>>::size_type getXSize() const {
+                    return xSize;
+                };
+                
+                std::vector<std::vector<std::complex<double>>> getData() const {
+                    return data;
+                };
+
+                std::complex<double> getValue(unsigned int y, unsigned int x) const {
+                    return data[y][x];
+                };
+
 
                 void print() {
                     for (int j = 0; j < ySize; j++)
@@ -84,27 +107,39 @@ namespace qsim {
 
                     for (int i = 0; i < ySize; i++){
                         for (int j = 0; j < xSize; j++) {
-                            res.data[j][i] = std::conj(data[i][j]);
+                            res.setValue(j, i, std::conj(data[i][j]));
                         };
                     };
 
                     return res;
                 };
 
+                Matrix controlled() {
+                    Matrix res(xSize * 2, ySize * 2);
+                    for (int j = 0; j < ySize; j++){
+                        res.setValue(j, j, 1);
+
+                        for (int i = 0; i < xSize; i++){
+                            res.setValue(ySize + j, xSize + i, data[j][i]);
+                        };
+                    };
+                    return res;
+                }
+
                 Matrix operator*=(Matrix const &mat) {
                     Matrix res(xSize, ySize);
                     std::complex<double> midresult = 0;
-                    if (xSize != mat.ySize) {
+                    if (xSize != mat.getYSize()) {
                         throw std::runtime_error("You're trying to multiply Matrices of incompatible sizes!");
                     } else {
-                        for (int i = 0; i < ySize; i++)
+                        for (int j = 0; j < ySize; j++)
                         {
-                            for (int j = 0; j < mat.xSize; j++)
+                            for (int i = 0; i < mat.getXSize(); i++)
                             {
-                                for (int k = 0; k < mat.ySize; k++) {
-                                    midresult += (data[i][k] * mat.data[k][j]);
+                                for (int k = 0; k < mat.getYSize(); k++) {
+                                    midresult += (data[i][k] * mat.getValue(k,j));
                                 };
-                                res.data[i][j] = midresult;
+                                res.setValue(j, i, midresult);
                                 midresult = 0;
                             };
                         };
@@ -114,20 +149,20 @@ namespace qsim {
                 };
         };
 
-        Matrix operator*(Matrix &mat1, Matrix &mat2) {
+        Matrix operator*(Matrix mat1, Matrix mat2) {
             return mat1 *= mat2;
         };
 
         // 2 matrix tensor product
         // test this pls
         Matrix tensorProduct (Matrix mat1, Matrix mat2) {
-            Matrix res(mat1.xSize * mat2.xSize, mat1.ySize * mat2.ySize);
+            Matrix res(mat1.getXSize() * mat2.getXSize(), mat1.getYSize() * mat2.getYSize());
 
-            for (int y1 = 0; y1 < mat1.ySize; y1++) {
-                for (int x1 = 0; x1 < mat1.xSize; x1++) {
-                    for (int y2 = 0; y2 < mat2.ySize; y2++) {
-                        for (int x2 = 0; x2 < mat2.xSize; x2++) {
-                            res.data[mat2.ySize * y1 + y2][mat2.xSize * x1 + x2] = mat1.data[y1][x1] * mat2.data[y2][x2];
+            for (int y1 = 0; y1 < mat1.getYSize(); y1++) {
+                for (int x1 = 0; x1 < mat1.getXSize(); x1++) {
+                    for (int y2 = 0; y2 < mat2.getYSize(); y2++) {
+                        for (int x2 = 0; x2 < mat2.getXSize(); x2++) {
+                            res.setValue(mat2.getYSize() * y1 + y2, mat2.getXSize() * x1 + x2, mat1.getValue(y1, x1) * mat2.getValue(y2, x2));
                         };
                     };
                 };
@@ -137,188 +172,207 @@ namespace qsim {
 
         class Ket
         {
-          public:
-            std::vector<std::complex<double>> data;
-            std::vector<std::complex<double>>::size_type size;
+            private:
+                std::vector<std::complex<double>> data;
+                std::vector<std::complex<double>>::size_type size;
 
-            Ket(){
+            public:
+                Ket(){
 
-            };
+                };
 
-            Ket(std::initializer_list<std::complex<double>> d) : data(d)
-            {
-                size = d.size();
-            };
-
-            Ket(unsigned int n)
-            {
-                setSize(n);
-            };
-
-            void setSize(unsigned int n)
-            {
-                size = n;
-                data.resize(n);
-            };
-
-            void print()
-            {
-                std::cout << std::endl;
-
-                for (int j = 0; j < size; j++)
+                Ket(std::initializer_list<std::complex<double>> d) : data(d)
                 {
-                    std::cout.precision(3);
-                    if (imag(data[j]) == 0)
-                    {
+                    size = d.size();
+                };
 
-                        std::cout << "| " << real(data[j]) << " |\n";
-                    }
-                    else if (real(data[j]) == 0)
+                Ket(unsigned int n)
+                {
+                    setSize(n);
+                };
+
+                void setSize(unsigned int n)
+                {
+                    size = n;
+                    data.resize(n);
+                };
+
+                void setValue(unsigned int index, const std::complex<double> value) {
+                    data[index] = value;
+                }
+
+
+                std::complex<double> getValue(unsigned int index) const {
+                    return data[index];
+                }
+
+                std::vector<std::complex<double>> getData() const {
+                    return data;
+                }
+
+                std::vector<std::complex<double>>::size_type getSize() const {
+                    return size;
+                };
+
+                void print()
+                {
+                    std::cout << std::endl;
+
+                    for (int j = 0; j < size; j++)
                     {
-                        std::cout << "| " << imag(data[j]) << "i |\n";
-                    }
-                    else
-                    {
-                        std::cout << "| " << real(data[j]) << " + " << imag(data[j]) << "i |\n";
+                        std::cout.precision(3);
+                        if (imag(data[j]) == 0)
+                        {
+
+                            std::cout << "| " << real(data[j]) << " |\n";
+                        }
+                        else if (real(data[j]) == 0)
+                        {
+                            std::cout << "| " << imag(data[j]) << "i |\n";
+                        }
+                        else
+                        {
+                            std::cout << "| " << real(data[j]) << " + " << imag(data[j]) << "i |\n";
+                        };
                     };
+
+                    std::cout << std::endl;
                 };
 
-                std::cout << std::endl;
-            };
+                /**************/
+                /*            */
+                /*  Operator  */
+                /*  overload  */
+                /*            */
+                /**************/
 
-            /**************/
-            /*            */
-            /*  Operator  */
-            /*  overload  */
-            /*            */
-            /**************/
-
-            // adding 2 Kets
-            Ket operator+(Ket const &obj) const
-            {
-                Ket res(size);
-                if (size != obj.data.size())
+                // adding 2 Kets
+                Ket operator+(Ket const &obj) const
                 {
-                    throw std::runtime_error("You're trying to add Kets of different sizes!");
-                };
-                for (unsigned int i = 0; i < size; i++)
-                {
-                    res.data[i] = data[i] + obj.data[i];
-                };
-                return res;
-            };
-
-            // minusing 2 Kets
-            Ket operator-(Ket const &obj) const
-            {
-                Ket res(size);
-
-                if (size != obj.data.size())
-                {
-                    throw std::runtime_error("You're trying to add Kets of different sizes!");
-                };
-                for (unsigned int i = 0; i < size; i++)
-                {
-                    res.data[i] = data[i] - obj.data[i];
-                };
-                return res;
-            };
-
-            // multiplying two kets
-            Ket operator*(Ket const &obj) const
-            {
-                Ket res(size * obj.size);
-
-                for (unsigned int i = 0; i < size; i++)
-                {
-                    for (unsigned int j = 0; j < obj.size; j++)
+                    Ket res(size);
+                    if (size != obj.getSize())
                     {
-                        res.data[i * obj.size + j] = data[i] * obj.data[j];
+                        throw std::runtime_error("You're trying to add Kets of different sizes!");
                     };
-                };
-                return res;
-            };
-
-            // dividing a Ket by a number
-            Ket operator/(std::complex<double> numerator) const
-            {
-                Ket res(size);
-
-                for (unsigned int i = 0; i < size; i++)
-                {
-                    res.data[i] = data[i] / numerator;
-                };
-                return res;
-            };
-
-            // multiplying a Ket by a number
-            Ket operator*(std::complex<double> multiplier) const
-            {
-                Ket res(size);
-
-                for (unsigned int i = 0; i < size; i++)
-                {
-                    res.data[i] = data[i] * multiplier;
-                };
-                return res;
-            };
-
-            // assign* a Ket with another
-            Ket operator*=(Ket const &obj2) {
-                *this = *this + obj2;
-                return *this;
-            }
-
-            // assign+ a Ket with another
-            Ket operator+=(Ket const &obj2)
-            {
-                *this = *this + obj2;
-                return *this;
-            };
-
-            // assign- a Ket with another
-            Ket operator-=(Ket const &obj2)
-            {
-                *this = *this - obj2;
-                return *this;
-            };
-
-            // assign* a Ket with a number
-            Ket operator*=(std::complex<double> multiplier)
-            {
-                *this = *this * multiplier;
-                return *this;
-            };
-
-            // assign/ a Ket with a number
-            Ket operator/=(std::complex<double> numerator)
-            {
-                *this = *this / numerator;
-                return *this;
-            };
-
-            // assign* apply a gate onto a Ket
-            Ket operator*=(Matrix mat)
-            {
-                Ket res(size);
-                std::complex<double> midresult = 0;
-
-                for (int gY = 0; gY < mat.ySize; gY++)
-                {
-                    for (int qS = 0; qS < size; qS++)
+                    for (unsigned int i = 0; i < size; i++)
                     {
-                        midresult += (mat.data[gY][qS] * data[qS]);
+                        res.setValue(i, data[i] + obj.getValue(i));                    
                     };
-                    res.data[gY] = midresult;
-                    midresult = 0;
+                    return res;
                 };
 
-                *this = res;
-                return *this;
-            };
+                // minusing 2 Kets
+                Ket operator-(Ket const &obj) const
+                {
+                    Ket res(size);
+
+                    if (size != obj.getSize())
+                    {
+                        throw std::runtime_error("You're trying to add Kets of different sizes!");
+                    };
+                    for (unsigned int i = 0; i < size; i++)
+                    {
+                        res.setValue(i, data[i] - obj.getValue(i));
+                    };
+                    return res;
+                };
+
+                // multiplying two kets
+                Ket operator*(Ket const &obj) const
+                {
+                    Ket res(size * obj.getSize());
+
+                    for (unsigned int i = 0; i < size; i++)
+                    {
+                        for (unsigned int j = 0; j < obj.getSize(); j++)
+                        {
+                            res.setValue(i * obj.getSize() + j, data[i] * obj.getValue(j));
+                        };
+                    };
+                    return res;
+                };
+
+                // dividing a Ket by a number
+                Ket operator/(std::complex<double> numerator) const
+                {
+                    Ket res(size);
+
+                    for (unsigned int i = 0; i < size; i++)
+                    {
+                        res.setValue(i, data[i] / numerator);
+                    };
+                    return res;
+                };
+
+                // multiplying a Ket by a number
+                Ket operator*(std::complex<double> multiplier) const
+                {
+                    Ket res(size);
+
+                    for (unsigned int i = 0; i < size; i++)
+                    {
+                        res.setValue(i, data[i] * multiplier);
+                    };
+                    return res;
+                };
+
+                // assign* a Ket with another
+                Ket operator*=(Ket const &obj2) {
+                    *this = *this * obj2;
+                    return *this;
+                }
+
+                // assign+ a Ket with another
+                Ket operator+=(Ket const &obj2)
+                {
+                    *this = *this + obj2;
+                    return *this;
+                };
+
+                // assign- a Ket with another
+                Ket operator-=(Ket const &obj2)
+                {
+                    *this = *this - obj2;
+                    return *this;
+                };
+
+                // assign* a Ket with a number
+                Ket operator*=(std::complex<double> multiplier)
+                {
+                    *this = *this * multiplier;
+                    return *this;
+                };
+
+                // assign/ a Ket with a number
+                Ket operator/=(std::complex<double> numerator)
+                {
+                    *this = *this / numerator;
+                    return *this;
+                };
+
+                // assign* apply a gate onto a Ket
+                Ket operator*=(Matrix mat)
+                {
+                    Ket res(size);
+                    std::complex<double> midresult = 0;
+
+                    for (int gY = 0; gY < mat.getYSize(); gY++)
+                    {
+                        for (int qS = 0; qS < size; qS++)
+                        {
+                            midresult += (mat.getValue(gY,qS) * data[qS]);
+                        };
+                        res.setValue(gY, midresult);
+                        midresult = 0;
+                    };
+
+                    *this = res;
+                    return *this;
+                };
+
         };
 
-    
+
 
         // Apply a gate onto a Ket
         Ket operator*(Matrix mat, Ket ket)
@@ -326,7 +380,8 @@ namespace qsim {
             return ket *= mat;
         };
 
-    };
-};
+
+    }; // end namespace math
+}; // end namespace qsim
 
 #endif
