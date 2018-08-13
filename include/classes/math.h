@@ -128,6 +128,12 @@ namespace qsim {
                     Matrix res(xSize, ySize);
                     std::complex<double> midresult = 0;
                     if (xSize != mat.getYSize()) {
+                        if (xSize == 1 && ySize == 1) {
+                            *this = mat;
+                            return *this;
+                        } else if (mat.getXSize() == 1 && mat.getYSize() == 1) {
+                            return *this;
+                        };
                         throw std::runtime_error("You're trying to multiply Matrices of incompatible sizes!");
                     } else {
                         for (int j = 0; j < ySize; j++)

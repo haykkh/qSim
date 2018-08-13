@@ -7,7 +7,8 @@
 #include <math.h>
 #include <complex>
 #include <map>
-#include <cstdarg>
+#include <algorithm>
+
 
 #include "classes/math.h"
 #include "classes/gates.h"

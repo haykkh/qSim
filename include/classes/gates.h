@@ -49,36 +49,13 @@ namespace gates {
                                        {0, 0, 1, 0},
                                        {0, 1, 0, 0},
                                        {0, 0, 0, 1} };
-    extern const math::Matrix CX = { {1, 0, 0, 0},
-                                     {0, 1, 0, 0},
-                                     {0, 0, 0, 1},
-                                     {0, 0, 1, 0} };
-    extern const math::Matrix CZ = { {1, 0, 0,   0},
-                                     {0, 1, 0,   0},
-                                     {0, 0, 1,   0},
-                                     {0, 0, 0, - 1} };
-    extern const math::Matrix CS = { {1, 0, 0,       0},
-                                     {0, 1, 0,       0},
-                                     {0, 0, 1,       0},
-                                     {0, 0, 0, math::I} };
+    extern const math::Matrix CX = control(X);
+    extern const math::Matrix CZ = control(Z);
+    extern const math::Matrix CS = control(S);
 
 
-    extern const math::Matrix CCNOT = { {1, 0, 0, 0, 0, 0, 0, 0},
-                                        {0, 1, 0, 0, 0, 0, 0, 0},                        
-                                        {0, 0, 1, 0, 0, 0, 0, 0},                        
-                                        {0, 0, 0, 1, 0, 0, 0, 0},                        
-                                        {0, 0, 0, 0, 1, 0, 0, 0},                        
-                                        {0, 0, 0, 0, 0, 1, 0, 0},                        
-                                        {0, 0, 0, 0, 0, 0, 0, 1},                        
-                                        {0, 0, 0, 0, 0, 0, 1, 0} };
-    extern const math::Matrix CSWAP = { {1, 0, 0, 0, 0, 0, 0, 0},
-                                        {0, 1, 0, 0, 0, 0, 0, 0},                        
-                                        {0, 0, 1, 0, 0, 0, 0, 0},                        
-                                        {0, 0, 0, 1, 0, 0, 0, 0},                        
-                                        {0, 0, 0, 0, 1, 0, 0, 0},                        
-                                        {0, 0, 0, 0, 0, 0, 1, 0},                        
-                                        {0, 0, 0, 0, 0, 1, 0, 0},                        
-                                        {0, 0, 0, 0, 0, 0, 0, 1} };
+    extern const math::Matrix CCNOT = control(control(X));
+    extern const math::Matrix CSWAP = control(SWAP);
 
 }
 };
