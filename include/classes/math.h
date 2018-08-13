@@ -16,6 +16,7 @@ namespace qsim {
                 std::vector<std::vector<std::complex<double>>> data;
                 std::vector<std::vector<std::complex<double>>>::size_type ySize;
                 std::vector<std::complex<double>>::size_type xSize;
+                bool control = false;
 
             public:
 
@@ -44,6 +45,14 @@ namespace qsim {
                 
                 void setValue(unsigned int y, unsigned int x, const std::complex<double> value) {
                     data[y][x] = value;
+                };
+
+                void setControlled(bool val) {
+                    control = val;
+                };
+
+                bool isControlled() {
+                    return control;
                 };
 
                 std::vector<std::vector<std::complex<double>>>::size_type getYSize() const {
@@ -114,17 +123,6 @@ namespace qsim {
                     return res;
                 };
 
-                Matrix controlled() {
-                    Matrix res(xSize * 2, ySize * 2);
-                    for (int j = 0; j < ySize; j++){
-                        res.setValue(j, j, 1);
-
-                        for (int i = 0; i < xSize; i++){
-                            res.setValue(ySize + j, xSize + i, data[j][i]);
-                        };
-                    };
-                    return res;
-                }
 
                 Matrix operator*=(Matrix const &mat) {
                     Matrix res(xSize, ySize);
@@ -169,6 +167,22 @@ namespace qsim {
             };
             return res;
         }
+
+        Matrix control(Matrix const input)
+        {
+            Matrix res(input.getXSize() * 2, input.getYSize() * 2);
+            for (int j = 0; j < input.getYSize(); j++)
+            {
+                res.setValue(j, j, 1);
+
+                for (int i = 0; i < input.getXSize(); i++)
+                {
+                    res.setValue(input.getYSize() + j, input.getXSize() + i, input.getValue(j,i));
+                };
+            };
+            res.setControlled(true);
+            return res;
+        };
 
         class Ket
         {
