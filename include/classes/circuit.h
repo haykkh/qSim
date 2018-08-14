@@ -40,6 +40,7 @@ class Circuit
             std::vector<math::Matrix> matrices;
             math::Matrix multiplyer = {{1}};
             std::vector<bool> range;
+            int trueNumber;
 
             for (auto i : circuit) {
                 range = std::vector<bool>(qubits.size());
@@ -56,28 +57,48 @@ class Circuit
                         range[objectFinder(j)] = true;
                     };
                 };
-                for (int m = 0; m < range.size(); m++) {
-                    if (range[m] == 1) {
-                        multiplyer = tensorProduct(multiplyer, i.first);
+
+                if (i.first.getXSize() >= 4) {
+                    if (i.first.isControlled()) {
+                        if (adjacent(i.second)) {
+                            int controlQubit = objectFinder(i.second[0]);
+                            for (int i = range.size(); i != controlQubit; i--) {
+                                //multiplyer = math::multiplyerApplicator(multiplyer, i.first)
+                            }
+                        } else {
+
+                        }
                     } else {
-                        multiplyer = tensorProduct(multiplyer, gates::I);
-                    };
+                        std::cout << "probably need to swap these" << std::endl;
+                    }
+                } else {
+                    multiplyer = math::multiplyerApplicator(multiplyer, i.first, gates::I, range);
                 };
+                
 
                 std::cout << "Gate: " << std::endl;
                 i.first.print();
                 multiplyer.print();
-                finalCircuit  = finalCircuit * multiplyer;
+                //finalCircuit  = finalCircuit * multiplyer;
             };
         };
 
-        int objectFinder(math::Ket *qub)
+        int objectFinder(math::Ket *q)
         {
             std::vector<math::Ket*>::iterator i = qubits.begin();
-            i = find (qubits.begin(), qubits.end(), qub);
+            i = find (qubits.begin(), qubits.end(), q);
             int b = distance (qubits.begin (), i);
             return b;
         }
+
+        bool adjacent(std::vector<math::Ket *> qub){
+            for (int i = 0; i < qub.size() - 1; i++) {
+                if (std::abs(objectFinder(qub[i]) - objectFinder(qub[i+1])) != 1) {
+                    return false;
+                };
+            };
+            return true;
+        };
 
         std::vector<math::Ket*> getQubits() const {
             return qubits;

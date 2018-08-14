@@ -49,13 +49,13 @@ namespace gates {
                                        {0, 0, 1, 0},
                                        {0, 1, 0, 0},
                                        {0, 0, 0, 1} };
-    extern const math::Matrix CX = control(X);
-    extern const math::Matrix CZ = control(Z);
-    extern const math::Matrix CS = control(S);
+    extern const math::Matrix CX = X.controlled();
+    extern const math::Matrix CZ = Z.controlled();
+    extern const math::Matrix CS = S.controlled();
 
 
-    extern const math::Matrix CCNOT = control(control(X));
-    extern const math::Matrix CSWAP = control(SWAP);
+    extern const math::Matrix CCNOT = X.controlled().controlled();
+    extern const math::Matrix CSWAP = SWAP.controlled();
 
 }
 };

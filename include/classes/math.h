@@ -17,7 +17,8 @@ namespace qsim {
                 std::vector<std::vector<std::complex<double>>>::size_type ySize;
                 std::vector<std::complex<double>>::size_type xSize;
                 bool control = false;
-
+                const Matrix* controlGate;
+                
             public:
 
 
@@ -51,7 +52,17 @@ namespace qsim {
                     control = val;
                 };
 
-                bool isControlled() {
+                void setData(std::vector<std::vector<std::complex<double>>> d) {
+                    data = d;
+                };
+
+                void setControlGate(const Matrix* mat)
+                {
+                    controlGate = mat;
+                };
+
+                bool isControlled()
+                {
                     return control;
                 };
 
@@ -67,10 +78,31 @@ namespace qsim {
                     return data;
                 };
 
-                std::complex<double> getValue(unsigned int y, unsigned int x) const {
+                Matrix getControlGate() const {
+                    return *controlGate;
+                };
+
+                std::complex<double> getValue(unsigned int y, unsigned int x) const
+                {
                     return data[y][x];
                 };
 
+                Matrix controlled() const
+                {
+                    Matrix res(xSize * 2, ySize * 2);
+                    for (int j = 0; j < ySize; j++)
+                    {
+                        res.setValue(j, j, 1);
+
+                        for (int i = 0; i < xSize; i++)
+                        {
+                            res.setValue(ySize + j, xSize + i, getValue(j, i));
+                        };
+                    };
+                    res.setControlGate(this);
+                    res.setControlled(true);
+                    return res;
+                };
 
                 void print() {
                     for (int j = 0; j < ySize; j++)
@@ -158,7 +190,6 @@ namespace qsim {
         };
 
         // 2 matrix tensor product
-        // test this pls
         Matrix tensorProduct (Matrix mat1, Matrix mat2) {
             Matrix res(mat1.getXSize() * mat2.getXSize(), mat1.getYSize() * mat2.getYSize());
 
@@ -174,21 +205,23 @@ namespace qsim {
             return res;
         }
 
-        Matrix control(Matrix const input)
+        Matrix multiplyerApplicator(Matrix multiplyer, Matrix gate, Matrix identity, std::vector<bool> range)
         {
-            Matrix res(input.getXSize() * 2, input.getYSize() * 2);
-            for (int j = 0; j < input.getYSize(); j++)
+            Matrix res = multiplyer;
+            for (int m = 0; m < range.size(); m++)
             {
-                res.setValue(j, j, 1);
-
-                for (int i = 0; i < input.getXSize(); i++)
+                if (range[m] == 1)
                 {
-                    res.setValue(input.getYSize() + j, input.getXSize() + i, input.getValue(j,i));
+                    res = tensorProduct(res, gate);
+                }
+                else
+                {
+                    res = tensorProduct(res, identity);
                 };
             };
-            res.setControlled(true);
             return res;
         };
+
 
         class Ket
         {
