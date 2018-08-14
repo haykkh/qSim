@@ -25,7 +25,7 @@ int main() {
 
     circuit::Circuit balls;
 
-    balls.setQubits({q1, q2});
+    balls.setQubits({q1});
 
     //balls.setCircuit({ { H, {q3}},
     //                   {CX, {q2, q3}},
@@ -49,5 +49,7 @@ int main() {
     Matrix fc = balls.getFinalCircuit();
 
     fc.print();
+
+
 
 }
