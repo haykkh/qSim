@@ -61,12 +61,33 @@ class Circuit
                 if (i.first.getXSize() >= 4) {
                     if (i.first.isControlled()) {
                         if (adjacent(i.second)) {
-                            int controlQubit = objectFinder(i.second[0]);
-                            for (int i = range.size(); i != controlQubit; i--) {
-                                //multiplyer = math::multiplyerApplicator(multiplyer, i.first)
-                            }
-                        } else {
+                            int controlCount = 0;
+                            math::Matrix buffer = i.first;
+                            
+                            while (buffer.isControlled()) {
+                                buffer = buffer.getControlGate();
+                                controlCount++;
+                            };
 
+                            int controlQubit = objectFinder(i.second[controlCount]);
+
+                            for (int k = range.size() - 1; k >= controlQubit; k--) {
+                                if (range[k] == 1)
+                                {
+                                    multiplyer = tensorProduct(buffer, multiplyer);
+                                }
+                                else
+                                {
+                                    multiplyer = tensorProduct(gates::I, multiplyer);
+                                };
+                            };
+
+                            for (int k = 0; k < controlCount; k++) {
+                                multiplyer = multiplyer.controlled();
+                            };
+
+                        } else {
+                            std::cout << "make adjacent" << std::endl;
                         }
                     } else {
                         std::cout << "probably need to swap these" << std::endl;
@@ -74,12 +95,12 @@ class Circuit
                 } else {
                     multiplyer = math::multiplyerApplicator(multiplyer, i.first, gates::I, range);
                 };
-                
 
-                std::cout << "Gate: " << std::endl;
-                i.first.print();
-                multiplyer.print();
-                //finalCircuit  = finalCircuit * multiplyer;
+
+                //std::cout << "Gate: " << std::endl;
+                //i.first.print();
+                //multiplyer.print();
+                finalCircuit  = finalCircuit * multiplyer;
             };
         };
 

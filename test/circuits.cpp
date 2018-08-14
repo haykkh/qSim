@@ -26,7 +26,7 @@ int main() {
 
     circuit::Circuit balls;
 
-    //balls.setQubits({q1, q2, q3});
+    balls.setQubits({q1, q2, q3});
 
     //balls.setCircuit({ { H, {q3}},
     //                   {CX, {q2, q3}},
@@ -45,23 +45,19 @@ int main() {
     //                   { T, {q1}},
     //                   { S, {q2}} });
 
-    //balls.setCircuit({{X, {q1}}, {CX, {q2, q3}}});
+    balls.setCircuit({{X, {q1}}, {CX, {q2, q3}}});
 
-    //Matrix fc = balls.getFinalCircuit();
+    Matrix fc = balls.getFinalCircuit();
 
-    //Matrix* c = CX.getControlGate();
+    fc.print();
 
-    //c->print();
+    Ket qubs = k1 * k2 * k3;
 
-    Matrix g = gates::S;
+    qubs.print();
 
-    H.setControlGate(&gates::S);
+    qubs *= fc;
 
-    Matrix n = CX.getControlGate();
-
-    n.print();
-    CX.print();
-
+    qubs.print();
 
 }
 
