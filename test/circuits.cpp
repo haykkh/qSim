@@ -61,8 +61,8 @@ int main() {
 
     vector<Matrix> p = balls.getMoments();
 
-    for (auto i : p) {
-        i.print();
+    for (int i = 0; i < 2; i++) {
+        balls.getMoment(i).print();
     };
 
 
