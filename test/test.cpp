@@ -9,12 +9,7 @@ int main() {
     Matrix X = gates::X;
     Matrix CX = control(X);
 
-    Matrix finalm = control(tensorProduct(I, tensorProduct(X, I)));
-    Matrix finaln = tensorProduct(control(tensorProduct(I, X)), I);
-
-
-    finalm.print();
-    finaln.print();
+    
 
 };
 
