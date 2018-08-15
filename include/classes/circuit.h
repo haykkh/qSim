@@ -13,6 +13,7 @@ class Circuit
         unsigned int n;
         math::Matrix finalCircuit = {{1}};
         std::vector<int> range;
+        std::vector<math::Matrix> moments;
 
     public:
         Circuit() {};
@@ -36,11 +37,15 @@ class Circuit
             circuitInitializer();
         };
 
+
+        void print() {
+
+        };
+
         void circuitInitializer() {
             std::vector<math::Matrix> matrices;
             math::Matrix multiplyer = {{1}};
             std::vector<bool> range;
-            int trueNumber;
 
             for (auto i : circuit) {
                 range = std::vector<bool>(qubits.size());
@@ -100,7 +105,8 @@ class Circuit
                 //std::cout << "Gate: " << std::endl;
                 //i.first.print();
                 //multiplyer.print();
-                finalCircuit  = finalCircuit * multiplyer;
+                moments.push_back(multiplyer);
+                finalCircuit  =   finalCircuit * multiplyer;
             };
         };
 
@@ -129,9 +135,18 @@ class Circuit
             return circuit;
         };
 
+        math::Matrix getMoment(int i) {
+            return moments[i];
+        };
+
+        std::vector<math::Matrix> getMoments() {
+            return moments;
+        };
+
         math::Matrix getFinalCircuit() {
             return finalCircuit;
         }
+        
 
 }; // end class Circuit
 

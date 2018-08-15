@@ -7,7 +7,7 @@ using namespace std;
 int main() {
     Ket k1 = states::z0;
     Ket k2 = states::z0;
-    Ket k3 = states::z0;
+    Ket k3 = states::z1;
 
     Matrix H = gates::H;
     Matrix CX = gates::X.controlled();
@@ -45,7 +45,7 @@ int main() {
     //                   { T, {q1}},
     //                   { S, {q2}} });
 
-    balls.setCircuit({{X, {q1}}, {CX, {q2, q3}}});
+    balls.setCircuit({{X, {q1}}, {CX, {q1, q2}}});
 
     Matrix fc = balls.getFinalCircuit();
 
@@ -58,6 +58,13 @@ int main() {
     qubs *= fc;
 
     qubs.print();
+
+    vector<Matrix> p = balls.getMoments();
+
+    for (auto i : p) {
+        i.print();
+    };
+
 
 }
 
