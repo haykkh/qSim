@@ -229,18 +229,19 @@ namespace qsim {
             return res;
         }
 
-        Matrix multiplyerApplicator(Matrix multiplyer, Matrix gate, Matrix identity, std::vector<bool> range)
+        Matrix multiplyerApplicator(Matrix multiplyer, Matrix gate, Matrix identity, std::vector<char> range)
         {
             Matrix res = multiplyer;
             for (int m = 0; m < range.size(); m++)
             {
-                if (range[m] == 1)
-                {
-                    res = tensorProduct(res, gate);
-                }
-                else
-                {
-                    res = tensorProduct(res, identity);
+                switch(range[m]) {
+                    case 'I': {
+                        res = tensorProduct(res, identity);
+                    };
+
+                    case 'T': {
+                        res = tensorProduct(res ,gate);
+                    };
                 };
             };
             return res;
