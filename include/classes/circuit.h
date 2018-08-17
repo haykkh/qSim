@@ -177,7 +177,6 @@ class Circuit
                 // add gate to moments
                 // 'add' gate to finalCircuit
                 moments.push_back(i.first);
-            
                 finalCircuit = finalCircuit * i.first;
             } else {
                 /*
@@ -199,19 +198,14 @@ class Circuit
                     controlCount++;
                 };
 
-                // populate range with 1s for qubits operated on and 0 for qubits not operated
+                // populate range with 'C's for control qubits
                 for (int q = 0; q < controlCount; q++) {
                     range[objectFinder(i.second[q])] = 'C';
                 };
-
+                // populate range with 'T's for target qubits
                 for (int q = controlCount; q < i.second.size(); q++) {
                     range[objectFinder(i.second[q])] = 'T';
                 }
-
-                std::cout << "range:\n";
-                for (auto z : range) {
-                    std::cout << z << std::endl;
-                };
 
                 // if gate.xSize >= 4 (ie multi qubit gate)
                 if (i.first.getXSize() >= 4)
@@ -227,7 +221,6 @@ class Circuit
                          */
                         int controlQubit = objectFinder(i.second[controlCount - 1]);
                         
-                        std::cout << "controlQubit: " << controlQubit << std::endl;
 
                         /*
                          *   Creates moment matrix up until the control qubit
