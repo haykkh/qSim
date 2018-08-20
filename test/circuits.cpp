@@ -5,12 +5,14 @@ using namespace math;
 using namespace std;
 
 int main() {
-    Ket k1 = states::z0;
-    Ket k2 = states::z0;
-    Ket k3 = states::z1;
+    Ket k1 = states::z1;
+    Ket k2 = states::z1;
+    Ket k3 = states::z0;
+    Ket k4 = states::z0;
 
     Matrix H = gates::H;
     Matrix CX = gates::X.controlled();
+    Matrix CCX = CX.controlled();
     Matrix T = gates::T;
     Matrix Td = T.adjoint();
     Matrix S = gates::S;
@@ -22,11 +24,14 @@ int main() {
     Ket* q1 = &k1;
     Ket* q2 = &k2;
     Ket* q3 = &k3;
+    Ket* q4 = &k4;
+
+    int b;
 
 
     circuit::Circuit balls;
 
-    balls.setQubits({q1, q2, q3});
+    balls.setQubits({q1, q2});
 
     //balls.setCircuit({ { H, {q3}},
     //                   {CX, {q2, q3}},
@@ -45,26 +50,22 @@ int main() {
     //                   { T, {q1}},
     //                   { S, {q2}} });
 
-    balls.setCircuit({{X, {q1}}, {CX, {q1, q2}}});
+    balls.setCircuit({{
+                        {X, {q1}},
+                        {X, {q2}}
+                        }});
 
     Matrix fc = balls.getFinalCircuit();
 
     fc.print();
 
-    Ket qubs = k1 * k2 * k3;
+    //Ket qubs = k1 * k2 * k3;
 
-    qubs.print();
+    //qubs.print();
 
-    qubs *= fc;
+    //qubs *= fc;
 
-    qubs.print();
-
-    vector<Matrix> p = balls.getMoments();
-
-    for (int i = 0; i < 2; i++) {
-        balls.getMoment(i).print();
-    };
-
+    //qubs.print();
 
 }
 

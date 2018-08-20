@@ -68,7 +68,7 @@ class Circuit
      *     { {CZ,{&q0, &q2}                 } }  <- m2: third 'moment'
      *   }
      */
-    std::vector<std::pair<math::Matrix, std::vector<math::Ket *>>> circuit;
+    std::vector<std::vector<std::pair<math::Matrix, std::vector<math::Ket *>>>> circuit;
 
 
     // number of qubits in system
@@ -98,7 +98,7 @@ class Circuit
   public:
     Circuit(){};
 
-    Circuit(std::vector<math::Ket *> qubs, std::vector<std::pair<math::Matrix, std::vector<math::Ket *>>> circ){
+    Circuit(std::vector<math::Ket *> qubs, std::vector<std::vector<std::pair<math::Matrix, std::vector<math::Ket *>>>> circ){
         qubits = qubs;
         circuit = circ;
         n = qubits.size();
@@ -117,7 +117,7 @@ class Circuit
      *   initializes matrix of entire circuit
      *   populates moments
      */
-    void setCircuit(const std::vector<std::pair<math::Matrix, std::vector<math::Ket*>>> circ) {
+    void setCircuit(const std::vector<std::vector<std::pair<math::Matrix, std::vector<math::Ket*>>>> circ) {
         circuit = circ;
         circuitInitializer();
     };
@@ -132,7 +132,8 @@ class Circuit
     void circuitInitializer() {
         // matrix of a time-slice of operations within the circuit
         math::Matrix moment = {{1}};
-
+        math::Matrix C = {{1}};
+        math::Matrix I = gates::I;
 
         /*
          *   a vector showing which qubits are operated on
@@ -147,7 +148,9 @@ class Circuit
          * 
          *   initialised to 'I's
          */
-        std::vector<char> range(n, 'I');
+        std::vector<math::Matrix *> range(n, &I);
+
+
 
 
         /*
@@ -155,130 +158,182 @@ class Circuit
          *   { {Gate, {qubits}}, {Gate, {qubits}} }
          */
         for (auto i : circuit) {
-            // reset range to all 'I'
-            range = std::vector<char>(n, 'I');
 
+            // reset range to all 'I'
+            range = std::vector<math::Matrix *>(n, &I);
 
             //reset moment
             moment = {{1}};
-            
-            
-            // if gate operates on a different number of qubits than specified
-            if (i.first.getXSize() != std::pow(2, i.second.size())) {
-                throw std::runtime_error("Invalid number of qubits to apply gate to");
-            };
-            
-            
-            /*
-             *   if vector of qubits is identical
-             *   in order and contents to entire system qubits
-             */
-            if (i.second == qubits) {
-                // add gate to moments
-                // 'add' gate to finalCircuit
-                moments.push_back(i.first);
-                finalCircuit = finalCircuit * i.first;
-            } else {
-                /*
-                 *   how many controls on gate
-                 *   eg CNOT : 1; CCNOT : 2
-                 */
-                int controlCount = 0;
 
-                /*
-                 *   eventually becomes the gate being controlled
-                 *   eg CNOT or CCNOT: NOT; CSWAP : SWAP
-                 */
-                math::Matrix buffer = i.first;
+            std::vector<math::Matrix> buffers;
+            
+            for (auto j : i) {
 
-                // populates buffer and counts up controlCount
-                while (buffer.isControlled())
-                {
-                    buffer = buffer.getControlGate();
-                    controlCount++;
+                if (j.first.getXSize() != std::pow(2, j.second.size())) {
+                    throw std::runtime_error("Invalid number of qubits to apply gate to");
                 };
 
-                // populate range with 'C's for control qubits
-                for (int q = 0; q < controlCount; q++) {
-                    range[objectFinder(i.second[q])] = 'C';
-                };
-                // populate range with 'T's for target qubits
-                for (int q = controlCount; q < i.second.size(); q++) {
-                    range[objectFinder(i.second[q])] = 'T';
+                if (j.second == qubits) {
+                    moments.push_back(j.first);
+                    finalCircuit = finalCircuit * j.first;
+                } else {
+                    int controlCount = 0;
+
+                    math::Matrix buffer = j.first;
+
+                    while (buffer.isControlled()) {
+                        buffer = buffer.getControlGate();
+                        controlCount++;
+                    };
+                    std::cout << "controlcount: " << controlCount << std::endl;
+                    buffers.push_back(buffer);
+
+
+                    for (int q = 0; q < controlCount; q++) {
+                        range[objectFinder(j.second[q])] = &C;
+                    };
+
+                    for (int q = controlCount; q < j.second.size(); q++){
+                        std::cout << "q: " << q << std::endl;
+                        std::cout << "index: " << objectFinder(j.second[q]) << std::endl;
+                        range[objectFinder(j.second[q])] = &buffers.back();
+                    }
+
                 }
 
-                // if gate.xSize >= 4 (ie multi qubit gate)
-                if (i.first.getXSize() >= 4)
+            }
+            std::cout << "mama\n";
+            for (auto b : range) {
+                std::cout << b << std::endl;
+            }
+
+            for (int k = range.size() - 1; k >= 0; k--)
+            {
+                if (range[k] == &C)
                 {
-
-                    // if gate is a controlled gate
-                    if (i.first.isControlled())
-                    {
-                        /*
-                         *   index of qubit which is the final control qubit
-                         *   eg CNOT(q0, q1);    CCNOT(q0, q1, q2)
-                         *            ^                     ^
-                         */
-                        int controlQubit = objectFinder(i.second[controlCount - 1]);
-                        
-
-                        /*
-                         *   Creates moment matrix up until the control qubit
-                         *   eg 
-                         *      ---●---
-                         *         │   
-                         *      --|X|--   moment = |X| ⨂ |𝐼|
-                         * 
-                         *      -------
-                         */
-                        for (int k = range.size() - 1; k >= 0 ; k--)
-                        {
-
-                            
-                            switch(range[k]){
-                                // if gate not on qubit, apply identity
-                                case 'I': {
-                                    moment = tensorProduct(gates::I, moment);
-                                    break;
-                                };
-                                // if qubit is controlled
-                                case 'C' : {
-                                    moment = moment.controlled();
-                                    break;
-                                };
-                                // if gate on qubit, apply gate
-                                case 'T' : {
-                                    moment = tensorProduct(buffer, moment);
-                                    break;
-                                };
-                            };
-                        
-                        };
-                    }
-
-                    // else gate not controlled
-                    else
-                    {
-                        std::cout << "probably need to swap these" << std::endl;
-                    }
+                    std::cout << "controlled\n";
+                    moment = moment.controlled();
                 }
-
-                // else single qubit gate
                 else
                 {
-                    moment = math::multiplyerApplicator(moment, i.first, gates::I, range);
+                    std::cout << "notCntrolled\n" << k << std::endl;
+                    range[k] -> print();
+                    moment = tensorProduct(*range[k], moment);
+                    std::cout << "haha\n";
                 };
-            };    
-            
-            //std::cout << "Gate: " << std::endl;
-            //i.first.print();
-            //moment.print();
-            
-            // append moment to moments vector
+            }
+
             moments.push_back(moment);
+            finalCircuit = finalCircuit * moment;
             
-            // 'add' moment to finalCircuit
-            finalCircuit  =   finalCircuit * moment;
+            //// if gate operates on a different number of qubits than specified
+            //if (i.first.getXSize() != std::pow(2, i.second.size())) {
+            //    throw std::runtime_error("Invalid number of qubits to apply gate to");
+            //};
+            //
+            //
+            ///*
+            // *   if vector of qubits is identical
+            // *   in order and contents to entire system qubits
+            // */
+            //if (i.second == qubits) {
+            //    // add gate to moments
+            //    // 'add' gate to finalCircuit
+            //    moments.push_back(i.first);
+            //    finalCircuit = finalCircuit * i.first;
+            //} else {
+            //    /*
+            //     *   how many controls on gate
+            //     *   eg CNOT : 1; CCNOT : 2
+            //     */
+            //    int controlCount = 0;
+//
+            //    /*
+            //     *   eventually becomes the gate being controlled
+            //     *   eg CNOT or CCNOT: NOT; CSWAP : SWAP
+            //     */
+            //    math::Matrix buffer = i.first;
+//
+            //    // populates buffer and counts up controlCount
+            //    while (buffer.isControlled())
+            //    {
+            //        buffer = buffer.getControlGate();
+            //        controlCount++;
+            //    };
+//
+            //    // populate range with 'C's for control qubits
+            //    for (int q = 0; q < controlCount; q++) {
+            //        range[objectFinder(i.second[q])] = 'C';
+            //    };
+            //    // populate range with 'T's for target qubits
+            //    for (int q = controlCount; q < i.second.size(); q++) {
+            //        range[objectFinder(i.second[q])] = 'T';
+            //    }
+//
+            //    // if gate.xSize >= 4 (ie multi qubit gate)
+            //    if (i.first.getXSize() >= 4)
+            //    {
+            //        // if gate is a controlled gate
+            //        if (i.first.isControlled())
+            //        {
+//
+            //            /*
+            //             *   Creates moment matrix up until the control qubit
+            //             *   eg 
+            //             *      ---●---
+            //             *         │   
+            //             *      --|X|--   moment = |X| ⨂ |𝐼|
+            //             * 
+            //             *      -------
+            //             */
+            //            for (int k = range.size() - 1; k >= 0 ; k--)
+            //            {
+//
+            //                
+            //                switch(range[k]){
+            //                    // if gate not on qubit, apply identity
+            //                    case 'I': {
+            //                        moment = tensorProduct(gates::I, moment);
+            //                        break;
+            //                    };
+            //                    // if qubit is controlled
+            //                    case 'C' : {
+            //                        moment = moment.controlled();
+            //                        break;
+            //                    };
+            //                    // if gate on qubit, apply gate
+            //                    case 'T' : {
+            //                        moment = tensorProduct(buffer, moment);
+            //                        break;
+            //                    };
+            //                };
+            //            
+            //            };
+            //        }
+//
+            //        // else gate not controlled
+            //        else
+            //        {
+            //            std::cout << "probably need to swap these" << std::endl;
+            //        }
+            //    }
+//
+            //    // else single qubit gate
+            //    else
+            //    {
+            //        moment = math::multiplyerApplicator(moment, i.first, gates::I, range);
+            //    };
+            //};    
+            //
+            ////std::cout << "Gate: " << std::endl;
+            ////i.first.print();
+            ////moment.print();
+            //
+            //// append moment to moments vector
+            //moments.push_back(moment);
+            //
+            //// 'add' moment to finalCircuit
+            //finalCircuit  =   finalCircuit * moment;
         };
     };
     
@@ -308,7 +363,7 @@ class Circuit
     };
 
 
-    std::vector<std::pair<math::Matrix, std::vector<math::Ket*>>> getCircuit() const {
+    std::vector<std::vector<std::pair<math::Matrix, std::vector<math::Ket*>>>> getCircuit() const {
         return circuit;
     };
 
