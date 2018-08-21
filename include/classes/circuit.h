@@ -148,7 +148,7 @@ class Circuit
          * 
          *   initialised to 'I's
          */
-        std::vector<math::Matrix *> range(n, &I);
+        std::vector<std::shared_ptr<math::Matrix>> range(n, std::make_shared<math::Matrix>(I));
 
 
 
@@ -160,12 +160,12 @@ class Circuit
         for (auto i : circuit) {
 
             // reset range to all 'I'
-            range = std::vector<math::Matrix *>(n, &I);
+            range = std::vector<std::shared_ptr<math::Matrix>>(n, std::make_shared<math::Matrix>(I));
 
             //reset moment
             moment = {{1}};
 
-            std::vector<math::Matrix> buffers;
+            std::vector<const math::Matrix> buffers;
             
             for (auto j : i) {
 
@@ -185,41 +185,30 @@ class Circuit
                         buffer = buffer.getControlGate();
                         controlCount++;
                     };
-                    std::cout << "controlcount: " << controlCount << std::endl;
                     buffers.push_back(buffer);
 
 
                     for (int q = 0; q < controlCount; q++) {
-                        range[objectFinder(j.second[q])] = &C;
+                        range[objectFinder(j.second[q])] = std::make_shared<math::Matrix>(C);
                     };
 
                     for (int q = controlCount; q < j.second.size(); q++){
-                        std::cout << "q: " << q << std::endl;
-                        std::cout << "index: " << objectFinder(j.second[q]) << std::endl;
-                        range[objectFinder(j.second[q])] = &buffers.back();
+                        range[objectFinder(j.second[q])] = std::make_shared<math::Matrix>(buffers.back());
                     }
 
                 }
 
             }
-            std::cout << "mama\n";
-            for (auto b : range) {
-                std::cout << b << std::endl;
-            }
 
             for (int k = range.size() - 1; k >= 0; k--)
             {
-                if (range[k] == &C)
+                if (range[k] == std::make_shared<math::Matrix>(C))
                 {
-                    std::cout << "controlled\n";
                     moment = moment.controlled();
                 }
                 else
                 {
-                    std::cout << "notCntrolled\n" << k << std::endl;
-                    range[k] -> print();
                     moment = tensorProduct(*range[k], moment);
-                    std::cout << "haha\n";
                 };
             }
 
