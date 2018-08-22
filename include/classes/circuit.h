@@ -132,7 +132,8 @@ class Circuit
     void circuitInitializer() {
         // matrix of a time-slice of operations within the circuit
         math::Matrix moment = {{1}};
-        math::Matrix C = {{1}};
+        math::Matrix cc = {{1}};
+        std::shared_ptr<math::Matrix> C = std::make_shared<math::Matrix>(cc);
         math::Matrix I = gates::I;
 
         /*
@@ -175,7 +176,7 @@ class Circuit
 
                 if (j.second == qubits) {
                     moments.push_back(j.first);
-                    finalCircuit = finalCircuit * j.first;
+                    finalCircuit = j.first * finalCircuit;
                 } else {
                     int controlCount = 0;
 
@@ -189,7 +190,7 @@ class Circuit
 
 
                     for (int q = 0; q < controlCount; q++) {
-                        range[objectFinder(j.second[q])] = std::make_shared<math::Matrix>(C);
+                        range[objectFinder(j.second[q])] = C;
                     };
 
                     for (int q = controlCount; q < j.second.size(); q++){
@@ -202,7 +203,7 @@ class Circuit
 
             for (int k = range.size() - 1; k >= 0; k--)
             {
-                if (range[k] == std::make_shared<math::Matrix>(C))
+                if (range[k] == C)
                 {
                     moment = moment.controlled();
                 }
@@ -210,10 +211,11 @@ class Circuit
                 {
                     moment = tensorProduct(*range[k], moment);
                 };
+
             }
 
             moments.push_back(moment);
-            finalCircuit = finalCircuit * moment;
+            finalCircuit = moment * finalCircuit;
             
             //// if gate operates on a different number of qubits than specified
             //if (i.first.getXSize() != std::pow(2, i.second.size())) {
