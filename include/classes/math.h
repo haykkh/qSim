@@ -179,6 +179,36 @@ namespace qsim {
                     return res;
                 };
 
+                Matrix operator-=(Matrix const &mat) {
+                    Matrix res(xSize, ySize);
+                    if (xSize != mat.getXSize() || ySize != mat.getYSize()) {
+                        throw std::runtime_error("You're trying to minus matrices of incompatible sizes!");
+                    } else {
+                        for (int j = 0; j < ySize; j++) {
+                            for (int i = 0; i < xSize; i++) {
+                                res.setValue(j, i, data[j][i] - mat.getValue(j, i));
+                            };
+                        };
+                    };
+                    *this = res;
+                    return *this;
+                };
+
+                Matrix operator+=(Matrix const &mat) {
+                    Matrix res(xSize, ySize);
+                    if (xSize != mat.getXSize() || ySize != mat.getYSize()) {
+                        throw std::runtime_error("You're trying to minus matrices of incompatible sizes!");
+                    } else {
+                        for (int j = 0; j < ySize; j++) {
+                            for (int i = 0; i < xSize; i++) {
+                                res.setValue(j, i, data[j][i] + mat.getValue(j, i));
+                            };
+                        };
+                    };
+                    *this = res;
+                    return *this;
+                };
+
 
                 Matrix operator*=(Matrix const &mat) {
                     Matrix res(xSize, ySize);
@@ -207,10 +237,48 @@ namespace qsim {
                     *this = res;
                     return *this;
                 };
+
+                Matrix operator*=(std::complex<double> multiplier) {
+                    Matrix res(xSize, ySize);
+                    for (int j = 0; j < ySize; j++) {
+                        for (int i = 0; i < xSize; i++) {
+                            res.setValue(j, i, data[j][i] * multiplier);
+                        };
+                    };
+                    *this = res;
+                    return *this;
+                };
+
+                Matrix operator/=(std::complex<double> divider) {
+                    Matrix res(xSize, ySize);
+                    for (int j = 0; j < ySize; j++) {
+                        for (int i = 0; i < xSize; i++) {
+                            res.setValue(j, i, data[j][i] / divider);
+                        };
+                    };
+                    *this = res;
+                    return *this;
+                };
         };
 
         Matrix operator*(Matrix mat1, Matrix mat2) {
             return mat1 *= mat2;
+        };
+
+        Matrix operator-(Matrix mat1, Matrix mat2) {
+            return mat1 -= mat2;
+        };
+
+        Matrix operator+(Matrix mat1, Matrix mat2) {
+            return mat1 += mat2;
+        };
+
+        Matrix operator*(Matrix mat1, std::complex<double> multiplier) {
+            return mat1 *= multiplier;
+        };
+
+        Matrix operator/(Matrix mat1, std::complex<double> divider){
+            return mat1 /= divider;
         };
 
         // 2 matrix tensor product
@@ -244,6 +312,16 @@ namespace qsim {
                     };
                 };
             };
+            return res;
+        };
+
+        Matrix In(unsigned int n) {
+            Matrix res(std::pow(2, n));
+
+            for (unsigned int i = 0; i < std::pow(2,n); i++) {
+                res.setValue(i, i, 1);
+            };
+
             return res;
         };
 
