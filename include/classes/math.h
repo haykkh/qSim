@@ -197,7 +197,7 @@ namespace qsim {
                 Matrix operator+=(Matrix const &mat) {
                     Matrix res(xSize, ySize);
                     if (xSize != mat.getXSize() || ySize != mat.getYSize()) {
-                        throw std::runtime_error("You're trying to minus matrices of incompatible sizes!");
+                        throw std::runtime_error("You're trying to add matrices of incompatible sizes!");
                     } else {
                         for (int j = 0; j < ySize; j++) {
                             for (int i = 0; i < xSize; i++) {
