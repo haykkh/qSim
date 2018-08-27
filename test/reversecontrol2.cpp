@@ -4,6 +4,36 @@ using namespace std;
 using namespace qsim;
 using namespace math;
 
+Matrix controller(vector<circuit::Gate> range, shared_ptr<Matrix> C, shared_ptr<Matrix> I) {
+     Matrix res = {{1}};
+
+    for (auto i : range) {
+        Matrix midres = {{1}};
+        if (i.containsControl()) {
+            for (auto gate : i.getGate()) {
+                if(gate == I || gate == C) {
+                    midres = tensorProduct(midres, *gate);
+                } else {
+                    midres = tensorProduct(midres, *gate - In(log(gate -> getXSize()) / log(2)));
+                };
+            };
+
+            midres = In(log(midres.getXSize()) / log(2)) + midres;
+
+        } else {
+            for (auto gate : i.getGate()) {
+                midres = tensorProduct(midres, *gate);
+            };
+        };
+        res = tensorProduct(res, midres);
+
+    };
+
+    return res;
+
+};
+
+
 int main() {
 
     Matrix ii = gates::I;
@@ -13,28 +43,54 @@ int main() {
 
     shared_ptr<Matrix> X = make_shared<Matrix>(xx);
 
-    vector<shared_ptr<Matrix>> range(3, I);
-
     Matrix zz = gates::Z;
 
     shared_ptr<Matrix> Z = make_shared<Matrix>(zz);
 
     Matrix cc = (In(1) - zz) / 2;
+    cc.setControlGate(true);
     shared_ptr<Matrix> C = make_shared<Matrix>(cc);
 
-    range = {C, X, I};
+    vector<vector<circuit::Gate>> range = {
+        {{C, X}},
+        {{X, C}},
+        
+        {{I}, {C, X}},
+        {{X, C}, {I}},
+        
+        {{C, X}, {I}},
+        {{I}, {X, C}},
 
-    for (auto i : range) {
-        i -> print();
+        {{C, I, X}},
+        {{X, I, C}},
+
+        {{I}, {C, X}, {I}},
+        {{I}, {X, C}, {I}},
+
+        {{C, C, X}},
+        {{X, C, C}},
+
+        {{C, C, X}, {I}},
+        {{X, C, C}, {I}},
+
+        {{C, I, C, X}},
+        {{X, C, I, C}},
+
+        {{C, X, C}},
+        {{I}, {C, X, C}},
+        {{C, X, C}, {I}},
+
+        {{X, I, C, C}},
+        {{C, C, I, X}}
     };
 
-    Matrix fin = tensorProduct(In(2) + tensorProduct(*C, *X - In(1)), In(1));
-
-    fin.print();
-
-    Matrix bin = In(3) + tensorProduct(*C, tensorProduct(In(1), *X - In(1)));
-    bin.print();
-
+    int j = 1;
+    for (auto i : range) {
+        cout << j << endl;
+        Matrix mat = controller(i, C, I);
+        mat.arrayPrint();
+        j++;
+    };
     /*
      *  basically need to use our for loop iterating through range
      *  and use the *C listed above for control gates 

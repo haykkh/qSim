@@ -28,6 +28,44 @@
 namespace qsim{
 namespace circuit{
 
+class Gate {
+    private:
+        bool controlled = false;
+        std::vector<std::shared_ptr<math::Matrix>> gates;
+
+    public:
+        Gate(){};
+
+        Gate(std::initializer_list<std::shared_ptr<math::Matrix>> g) {
+            gates = g;
+            gateChecker();
+        };
+
+        void setGate(const std::vector<std::shared_ptr<math::Matrix>> g) {
+            gates = g;
+            gateChecker();
+        };
+
+        void gateChecker() {
+            for (auto i : gates) {
+                if (i -> isControlGate()) {
+                    controlled = true;
+                    ranger();
+                };
+            };
+        }
+
+        void ranger(){};
+
+        bool containsControl() {
+            return controlled;
+        };
+
+        std::vector<std::shared_ptr<math::Matrix>> getGate() {
+            return gates;
+        };
+};
+
 class Circuit
 {
     /*
@@ -218,13 +256,16 @@ class Circuit
 
                     // populates buffer and counts up controlCount
                     while (buffer.isControlled()) {
-                        buffer = buffer.getControlGate();
+                        buffer = buffer.getGateControlled();
                         controlCount++;
                     };
 
                     // adds buffer gate to buffers
                     buffers.push_back(buffer);
 
+                    //if (controlCount > 0) {
+                    //    range[objectFinder(j.second[0])] = controller(buffer, )
+                    //}
 
                     // populates range with C for control qubits
                     for (int q = 0; q < controlCount; q++) {

@@ -41,7 +41,8 @@ namespace qsim {
                 std::vector<std::vector<std::complex<double>>>::size_type ySize;
                 std::vector<std::complex<double>>::size_type xSize;
                 bool control = false;
-                const Matrix* controlGate;
+                bool controlledGate = false;
+                const Matrix* gateControlled;
                 
             public:
 
@@ -73,21 +74,29 @@ namespace qsim {
                 };
 
                 void setControlled(bool val) {
-                    control = val;
+                    controlledGate = val;
                 };
 
                 void setData(std::vector<std::vector<std::complex<double>>> d) {
                     data = d;
                 };
 
-                void setControlGate(const Matrix* mat)
+                void setGateControlled(const Matrix* mat)
                 {
-                    controlGate = mat;
+                    gateControlled = mat;
+                };
+
+                void setControlGate(bool val) {
+                    control = val;
+                };
+
+                bool isControlGate() {
+                    return control;
                 };
 
                 bool isControlled()
                 {
-                    return control;
+                    return controlledGate;
                 };
 
                 std::vector<std::vector<std::complex<double>>>::size_type getYSize() const {
@@ -102,8 +111,8 @@ namespace qsim {
                     return data;
                 };
 
-                Matrix getControlGate() const {
-                    return *controlGate;
+                Matrix getGateControlled() const {
+                    return *gateControlled;
                 };
 
                 std::complex<double> getValue(unsigned int y, unsigned int x) const
@@ -123,7 +132,7 @@ namespace qsim {
                             res.setValue(ySize + j, xSize + i, getValue(j, i));
                         };
                     };
-                    res.setControlGate(this);
+                    res.setGateControlled(this);
                     res.setControlled(true);
                     return res;
                 };
@@ -158,6 +167,70 @@ namespace qsim {
                                 } else {
                                     std::cout << " " << std::real(data[j][i]) << " + " << std::imag(data[j][i]) << "i ";
                                 };
+                            };
+                        };
+
+                        std::cout << "|\n";
+                    };
+
+                    std::cout << std::endl;
+                };
+
+                void noZeroPrint() {
+                    for (int j = 0; j < ySize; j++)
+                    {
+                        std::cout.precision(3);
+                        std::cout << "|";
+
+                        for (int i = 0; i < xSize; i++)
+                        {
+                            if (data[j][i] == 0.) {
+                                std::cout << "   ";
+                            } else {
+                                if (std::imag(data[j][i]) == 0)
+                                {
+                                
+                                    std::cout << " " << std::real(data[j][i]) << " ";
+                                }
+                                else if (real(data[j][i]) == 0)
+                                {
+                                    if (std::abs(std::imag(data[j][i])) == 1.) {
+                                        std::cout << " " << sgn(std::imag(data[j][i])) << "i ";
+                                    } else {
+                                        std::cout << " " << std::imag(data[j][i]) << "i ";
+                                    };
+                                }
+                                else
+                                {
+                                    if (std::abs(std::imag(data[j][i])) == 1.)
+                                    {
+                                        std::cout << " " << std::real(data[j][i]) << " + "
+                                                  << " " << sgn(std::imag(data[j][i])) << "i ";
+                                    } else {
+                                        std::cout << " " << std::real(data[j][i]) << " + " << std::imag(data[j][i]) << "i ";
+                                    };
+                                };
+                            };
+                        };
+
+                        std::cout << "|\n";
+                    };
+
+                    std::cout << std::endl;
+                };
+
+                void arrayPrint() {
+                    for (int j = 0; j < ySize; j++)
+                    {
+                        std::cout.precision(3);
+                        std::cout << "|";
+
+                        for (int i = 0; i < xSize; i++)
+                        {
+                            if (data[j][i] == 0.) {
+                                std::cout << "   ";
+                            } else {
+                                std::cout << " █ ";
                             };
                         };
 
