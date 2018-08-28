@@ -302,7 +302,7 @@ namespace qsim {
                                 for (int k = 0; k < mat.getYSize(); k++) {
                                     midresult += (data[i][k] * mat.getValue(k,j));
                                 };
-                                res.setValue(j, i, midresult);
+                                res.setValue(i, j, midresult);
                                 midresult = 0;
                             };
                         };
