@@ -36,8 +36,17 @@ class Gate {
     public:
         Gate(){};
 
+        Gate(unsigned int n) {
+            gates.resize(n);
+        };
+
         Gate(std::initializer_list<std::shared_ptr<math::Matrix>> g) {
             gates = g;
+            gateChecker();
+        };
+
+        void setGate(unsigned int index, std::shared_ptr<math::Matrix> m) {
+            gates[index] = m;
             gateChecker();
         };
 
@@ -48,9 +57,11 @@ class Gate {
 
         void gateChecker() {
             for (auto i : gates) {
-                if (i -> isControlGate()) {
-                    controlled = true;
-                    ranger();
+                if (i != 0) {
+                    if (i -> isControlGate()) {
+                        controlled = true;
+                        ranger();
+                    };
                 };
             };
         }
@@ -64,6 +75,35 @@ class Gate {
         std::vector<std::shared_ptr<math::Matrix>> getGate() {
             return gates;
         };
+};
+
+math::Matrix gater(std::vector<Gate> range, std::shared_ptr<math::Matrix> C, std::shared_ptr<math::Matrix> I) {
+     math::Matrix res = {{1}};
+
+    for (auto i : range) {
+        math::Matrix midres = {{1}};
+        if (i.containsControl()) {
+            for (auto gate : i.getGate()) {
+                if(gate == I || gate == C) {
+                    midres = tensorProduct(midres, *gate);
+                } else {
+                    midres = tensorProduct(midres, *gate - math::In(log(gate -> getXSize()) / log(2)));
+                };
+            };
+
+            midres = math::In(log(midres.getXSize()) / log(2)) + midres;
+
+        } else {
+            for (auto gate : i.getGate()) {
+                midres = tensorProduct(midres, *gate);
+            };
+        };
+        res = tensorProduct(res, midres);
+
+    };
+
+    return res;
+
 };
 
 class Circuit
@@ -172,7 +212,7 @@ class Circuit
         math::Matrix moment = {{1}};
         
         // empty control gate, used later as reference
-        math::Matrix cc = {{1}};
+        math::Matrix cc = (math::In(1) - gates::Z) / 2;
         std::shared_ptr<math::Matrix> C = std::make_shared<math::Matrix>(cc);
 
         // identity matrix
@@ -190,7 +230,7 @@ class Circuit
          * 
          *   initialised to Is
          */
-        std::vector<std::shared_ptr<math::Matrix>> range(n, I);
+        std::vector<Gate> range;
 
 
 
@@ -202,7 +242,9 @@ class Circuit
         for (auto i : circuit) {
 
             // reset range to all I
-            range = std::vector<std::shared_ptr<math::Matrix>>(n, I);
+            range.clear();
+
+            std::vector<math::Ket *> qubitsCopy = qubits;
 
             //reset moment
             moment = {{1}};
@@ -222,6 +264,21 @@ class Circuit
              */
             for (auto j : i) {
 
+                
+                int minQubit = n - 1;
+                int maxQubit = 0;
+                for (auto k : j.second) {
+                    if (objectFinder(qubits, k) < minQubit) {
+                        minQubit = objectFinder(qubits, k);
+                    };
+                    if (objectFinder(qubits, k) > maxQubit) {
+                        maxQubit = objectFinder(qubits, k);
+                    };
+                };
+
+                Gate midrange(maxQubit - minQubit + 1);
+
+                std::vector<math::Ket *> midrangeQubitsCopy(qubits.begin() + minQubit, qubits.begin() + maxQubit + 1);
 
                 /*
                  *  if gate operates on a different number
@@ -260,59 +317,73 @@ class Circuit
                         controlCount++;
                     };
 
+
                     // adds buffer gate to buffers
                     buffers.push_back(buffer);
 
-                    //if (controlCount > 0) {
-                    //    range[objectFinder(j.second[0])] = controller(buffer, )
-                    //}
-
                     // populates range with C for control qubits
                     for (int q = 0; q < controlCount; q++) {
-                        range[objectFinder(j.second[q])] = C;
+                        int index = objectFinder(qubits, j.second[q]);
+                        int midIndex = objectFinder(midrangeQubitsCopy, j.second[q]);
+                        midrange.setGate(midIndex, C);
+                        qubitsCopy[index] = 0;
+                        midrangeQubitsCopy[midIndex] = 0;
+                        //range[objectFinder(j.second[q])] = C;
                     };
 
                     // populates range with gate applied for target qubits
                     for (int q = controlCount; q < j.second.size(); q++){
-                        range[objectFinder(j.second[q])] = std::make_shared<math::Matrix>(buffers.back());
+                        int index = objectFinder(qubits, j.second[q]);
+                        int midIndex = objectFinder(midrangeQubitsCopy, j.second[q]);
+                        midrange.setGate(midIndex, std::make_shared<math::Matrix>(buffers.back()));
+                        qubitsCopy[index] = 0;
+                        midrangeQubitsCopy[midIndex] = 0;
+                        //range[objectFinder(j.second[q])] = std::make_shared<math::Matrix>(buffers.back());
                     }
 
-                }
+                    for (auto q : midrangeQubitsCopy) {
+                        if (q != 0) {
+                            int index = objectFinder(qubits, q);
+                            int midIndex = objectFinder(midrangeQubitsCopy, q);
+                            midrange.setGate(midIndex, I);
+                            qubitsCopy[index] = 0;
+                        };
+                    };
 
-            }
+                    range.push_back(midrange);
+
+                }
+            };
+
+            for (auto q : qubitsCopy) {
+                if (q != 0) {
+                    int index = objectFinder(qubits, q);
+                    range.insert(range.begin() + index, {I});
+                };
+            };
 
             /*
              *  iterates through range (in reverse order)
              *  if qubit is to be controlled, control it
              *  if qubit is to be 'gated', gate it
              */
-            for (int k = range.size() - 1; k >= 0; k--)
-            {
-                if (range[k] == C)
-                {
-                    moment = moment.controlled();
-                }
-                else
-                {
-                    moment = tensorProduct(*range[k], moment);
-                };
-
-            };
+            moment = gater(range, C, I);
 
             // append moment to moments
             moments.push_back(moment);
 
             // 'add' moment to finalCircuit
             finalCircuit = moment * finalCircuit;
+            finalCircuit.print();
         };
     };
     
     
     // returns the index of a qubit in 'qubits' vector
-    int objectFinder(math::Ket *q){
-        std::vector<math::Ket*>::iterator i = qubits.begin();
-        i = find (qubits.begin(), qubits.end(), q);
-        int b = distance (qubits.begin (), i);
+    int objectFinder(std::vector<math::Ket*> vec, math::Ket *q){
+        std::vector<math::Ket*>::iterator i = vec.begin();
+        i = find (vec.begin(), vec.end(), q);
+        int b = distance (vec.begin (), i);
         return b;
     };
     
@@ -320,7 +391,7 @@ class Circuit
     bool adjacent(std::vector<math::Ket *> qub){
         for (int i = 0; i < qub.size() - 1; i++) {
             // if the distance between qub[i] and qub[i+1] isn't 1 they are not adjacent
-            if (std::abs(objectFinder(qub[i]) - objectFinder(qub[i+1])) != 1) {
+            if (std::abs(objectFinder(qubits, qub[i]) - objectFinder(qubits, qub[i+1])) != 1) {
                 return false;
             };
         };
