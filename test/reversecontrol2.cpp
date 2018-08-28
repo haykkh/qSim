@@ -51,46 +51,99 @@ int main() {
     cc.setControlGate(true);
     shared_ptr<Matrix> C = make_shared<Matrix>(cc);
 
-    vector<vector<circuit::Gate>> range = {
-        {{C, X}},
-        {{X, C}},
-        
-        {{I}, {C, X}},
-        {{X, C}, {I}},
-        
-        {{C, X}, {I}},
-        {{I}, {X, C}},
+    Matrix hh = gates::H;
+    shared_ptr<Matrix> H = make_shared<Matrix>(hh);
 
+    Matrix ss = gates::S;
+    shared_ptr<Matrix> S = make_shared<Matrix>(ss);
+
+    vector<vector<circuit::Gate>> toffoli = {
+        {{I, I, H}},
+        {{I}, {C, S}},
+        {{C, X}, {I}},
+        {{I}, {C, S}},
+        {{I}, {C, S}},
+        {{I}, {C, S}},
+        {{C, X}, {I}},
+        {{C, I, S}},
+        {{I, I, H}}
+    };
+
+    Matrix fin = {{1}};
+
+    for (auto i : toffoli) {
+        Matrix mid = controller(i, C, I);
+        fin  = mid * fin;
+    };
+
+    fin.print();
+
+
+    vector<vector<circuit::Gate>> bell = {
         {{C, I, X}},
         {{X, I, C}},
-
-        {{I}, {C, X}, {I}},
-        {{I}, {X, C}, {I}},
-
-        {{C, C, X}},
         {{X, C, C}},
-
-        {{C, C, X}, {I}},
-        {{X, C, C}, {I}},
-
-        {{C, I, C, X}},
-        {{X, C, I, C}},
-
         {{C, X, C}},
-        {{I}, {C, X, C}},
-        {{C, X, C}, {I}},
-
-        {{X, I, C, C}},
-        {{C, C, I, X}}
+        {{C, X}, {X}},
+        {{X}, {X, C}},
+        {{X, C}, {X}},
+        {{X, I, C}}
     };
 
-    int j = 1;
-    for (auto i : range) {
-        cout << j << endl;
-        Matrix mat = controller(i, C, I);
-        mat.arrayPrint();
-        j++;
+    Matrix bin = {{1}};
+    for (auto i : bell) {
+        Matrix mid = controller(i, C, I);
+        //cout << "mid\n";
+        //mid.arrayPrint();
+        bin =  mid * bin;
+        //cout << "bin\n";
+        //bin.arrayPrint();
     };
+    bin.arrayPrint();
+
+
+    //vector<vector<circuit::Gate>> range = {
+    //    {{C, X}},
+    //    {{X, C}},
+    //    
+    //    {{I}, {C, X}},
+    //    {{X, C}, {I}},
+    //    
+    //    {{C, X}, {I}},
+    //    {{I}, {X, C}},
+//
+    //    {{C, I, X}},
+    //    {{X, I, C}},
+//
+    //    {{I}, {C, X}, {I}},
+    //    {{I}, {X, C}, {I}},
+//
+    //    {{C, C, X}},
+    //    {{X, C, C}},
+//
+    //    {{C, C, X}, {I}},
+    //    {{X, C, C}, {I}},
+//
+    //    {{C, I, C, X}},
+    //    {{X, C, I, C}},
+//
+    //    {{C, X, C}},
+//
+//
+    //    {{I}, {C, X, C}},
+    //    {{C, X, C}, {I}},
+//
+    //    {{C, C, I, X}},
+    //    {{X, I, C, C}}
+    //};
+
+    //int j = 1;
+    //for (auto i : range) {
+    //    cout << j << endl;
+    //    Matrix mat = controller(i, C, I);
+    //    mat.arrayPrint();
+    //    j++;
+    //};
     /*
      *  basically need to use our for loop iterating through range
      *  and use the *C listed above for control gates 
