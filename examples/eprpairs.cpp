@@ -9,14 +9,33 @@ int main () {
     Ket b = states::z0;
     Ket b00 = states::b00;
 
+    Ket* A = &a;
+    Ket* B = &b;
+
     Matrix H = gates::H;
     Matrix CX = gates::CX;
 
-    a *= H;
+    circuit::Circuit bell;
+
+    bell.setQubits({A, B});
+
+    bell.setCircuit({
+        {
+            {H, {A}}
+        },
+        {
+            {CX, {A, B}}
+        }
+    });
+
+
+    Matrix fc = bell.getFinalCircuit();
+
+    fc.print();
 
     Ket c = a * b;
 
-    c *= CX;
+    c *= fc;
 
     cout << "Our result is:\n";
     c.print();
