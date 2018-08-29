@@ -213,6 +213,8 @@ class Circuit
         
         // empty control gate, used later as reference
         math::Matrix cc = (math::In(1) - gates::Z) / 2;
+        cc.setControlGate(true);
+
         std::shared_ptr<math::Matrix> C = std::make_shared<math::Matrix>(cc);
 
         // identity matrix
@@ -230,7 +232,7 @@ class Circuit
          * 
          *   initialised to Is
          */
-        std::vector<Gate> range;
+        std::vector<Gate> range(n, {I});
 
 
 
@@ -242,9 +244,8 @@ class Circuit
         for (auto i : circuit) {
 
             // reset range to all I
-            range.clear();
+            range = std::vector<Gate>(n, {I});
 
-            std::vector<math::Ket *> qubitsCopy = qubits;
 
             //reset moment
             moment = {{1}};
@@ -321,14 +322,16 @@ class Circuit
                     // adds buffer gate to buffers
                     buffers.push_back(buffer);
 
+                    int deletes = 0;
+
                     // populates range with C for control qubits
                     for (int q = 0; q < controlCount; q++) {
                         int index = objectFinder(qubits, j.second[q]);
                         int midIndex = objectFinder(midrangeQubitsCopy, j.second[q]);
                         midrange.setGate(midIndex, C);
-                        qubitsCopy[index] = 0;
+                        range.erase(range.begin() + index - deletes);
                         midrangeQubitsCopy[midIndex] = 0;
-                        //range[objectFinder(j.second[q])] = C;
+                        deletes++;
                     };
 
                     // populates range with gate applied for target qubits
@@ -336,9 +339,9 @@ class Circuit
                         int index = objectFinder(qubits, j.second[q]);
                         int midIndex = objectFinder(midrangeQubitsCopy, j.second[q]);
                         midrange.setGate(midIndex, std::make_shared<math::Matrix>(buffers.back()));
-                        qubitsCopy[index] = 0;
+                        range.erase(range.begin() + index - deletes);
                         midrangeQubitsCopy[midIndex] = 0;
-                        //range[objectFinder(j.second[q])] = std::make_shared<math::Matrix>(buffers.back());
+                        deletes++;
                     }
 
                     for (auto q : midrangeQubitsCopy) {
@@ -346,20 +349,14 @@ class Circuit
                             int index = objectFinder(qubits, q);
                             int midIndex = objectFinder(midrangeQubitsCopy, q);
                             midrange.setGate(midIndex, I);
-                            qubitsCopy[index] = 0;
+                            range.erase(range.begin() + index - deletes);
+                            deletes++;
                         };
                     };
 
-                    range.push_back(midrange);
+                    range.insert(range.begin() + minQubit, midrange);
 
                 }
-            };
-
-            for (auto q : qubitsCopy) {
-                if (q != 0) {
-                    int index = objectFinder(qubits, q);
-                    range.insert(range.begin() + index, {I});
-                };
             };
 
             /*
@@ -374,7 +371,7 @@ class Circuit
 
             // 'add' moment to finalCircuit
             finalCircuit = moment * finalCircuit;
-            finalCircuit.print();
+
         };
     };
     
