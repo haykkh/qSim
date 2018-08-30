@@ -447,6 +447,28 @@ namespace qsim {
                     return size;
                 };
 
+                void measure(){
+                    std::vector<double> p;
+                    double summer;
+
+                    for (auto q : data) {
+                        summer += std::pow(std::abs(q), 2);
+                        p.push_back(summer);
+                    };
+
+                    std::random_device rd;
+                    std::mt19937 gen(rd());
+                    std::uniform_real_distribution<> dis(0,1);
+                    double rnd = dis(gen);
+
+                    int qub = std::upper_bound(p.begin(), p.end(), rnd) - p.begin();
+
+                    data = std::vector<std::complex<double>>(size);
+
+                    setValue(qub, 1);
+
+                }
+
                 void print()
                 {
                     std::cout << std::endl;
