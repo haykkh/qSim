@@ -28,19 +28,6 @@
 namespace qsim {
 namespace gates {
 
-    class Gate {
-        public:
-            math::Matrix final;
-
-            Gate();
-
-            Gate(math::Matrix gate) : final(gate) {};
-
-            Gate(std::vector<math::Ket> qubits) {
-
-            }
-    };
-
     extern const math::Matrix I = {{1, 0}, {0, 1}};
 
     /**********************/
@@ -81,7 +68,37 @@ namespace gates {
     extern const math::Matrix CCNOT = X.controlled().controlled();
     extern const math::Matrix CSWAP = SWAP.controlled();
 
-}
-};
+    math::Matrix R(double k) {
+        return {{1, 0}, {0, math::omega(k)}};
+    };
+
+    math::Matrix phaseShift(double phi) {
+        return {{1, 0}, {0, std::exp(math::I * phi)}};
+    };
+
+    math::Matrix QFT(int N) {
+        int n = std::log(N) / std::log(2);
+        std::complex<double> om = math::omega(n);
+
+
+        math::Matrix res(N);
+
+        for (int j = 0; j < N; j++) {
+            for (int i = 0; i < N; i++) {
+                if (j == 0 || i == 0) {
+                    res.setValue(j, i, 1 / std::sqrt(N));
+                } else {
+                    res.setValue(j, i, std::pow(om, i * j) / std::sqrt(N));
+                };
+            };
+        };
+
+        return res;
+
+    };
+
+
+} // end gates namespace
+}; // end qsim namespace
 
 #endif
