@@ -28,6 +28,9 @@
 namespace qsim{
 namespace circuit{
 
+typedef std::vector<std::pair<math::Matrix, std::vector<math::Ket*>>> momentScheme;
+typedef std::vector<momentScheme> schematic;
+
 class Gate {
     private:
         bool controlled = false;
@@ -146,7 +149,7 @@ class Circuit
      *     { {CZ,{&q0, &q2}                 } }  <- m2: third 'moment'
      *   }
      */
-    std::vector<std::vector<std::pair<math::Matrix, std::vector<math::Ket *>>>> circuit;
+    schematic circuit;
 
 
     // number of qubits in system
@@ -176,7 +179,7 @@ class Circuit
   public:
     Circuit(){};
 
-    Circuit(std::vector<math::Ket *> qubs, std::vector<std::vector<std::pair<math::Matrix, std::vector<math::Ket *>>>> circ){
+    Circuit(std::vector<math::Ket *> qubs, schematic circ){
         qubits = qubs;
         circuit = circ;
         n = qubits.size();
@@ -195,7 +198,7 @@ class Circuit
      *   initializes matrix of entire circuit
      *   populates moments
      */
-    void setCircuit(const std::vector<std::vector<std::pair<math::Matrix, std::vector<math::Ket*>>>> circ) {
+    void setCircuit(const schematic circ) {
         circuit = circ;
         circuitInitializer();
     };
