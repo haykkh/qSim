@@ -31,6 +31,10 @@ namespace qsim {
         extern const std::complex<double> I(0,1);
         extern const double pi = std::atan(1) * 4;
 
+        std::complex<double> omega(int n) {
+            return std::exp((2 * pi * I) / std::pow(2, n));
+        };
+
         template <typename T> const char* sgn(T val) {
             return (val > 0) ? "" : "-";
         };
