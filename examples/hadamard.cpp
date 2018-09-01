@@ -35,14 +35,23 @@ int main() {
 
     Matrix fc = hadamard.getFinalCircuit();
 
+
+    cout << "\nCircuit matrix:\n";
     fc.print();
 
     Ket state = k0 * k1 * k2;
 
+    cout << "\nSystem starting state:\n";
     state.print();
 
     state *= fc;
 
+    cout << "\nSystem state after circuit:\n";
+    state.print();
+
+    state.measure();
+
+    cout << "\nSystem state after measurement:\n";
     state.print();
 
 }

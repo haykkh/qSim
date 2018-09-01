@@ -56,6 +56,7 @@ int main() {
 
     Matrix fc = toffoli.getFinalCircuit();
 
+    cout << "\nToffoli gate matrix:\n";
     fc.print();
 
 

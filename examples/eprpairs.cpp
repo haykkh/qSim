@@ -31,17 +31,26 @@ int main () {
 
     Matrix fc = bell.getFinalCircuit();
 
+    cout << "\nCircuit Matrix:\n";
     fc.print();
 
     Ket c = a * b;
 
-    c *= fc;
-
-    cout << "Our result is:\n";
+    cout << "\nSystem starting state:\n";
     c.print();
 
-    cout << "The true result is:\n";
+    c *= fc;
+
+    cout << "\nOur result is:\n";
+    c.print();
+
+    cout << "\nThe true result is:\n";
     b00.print();
+
+    c.measure();
+    cout << "\nState after measurement:\n";
+
+    c.print();
 
 
 }

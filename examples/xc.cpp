@@ -33,5 +33,6 @@ int main() {
 
     Matrix fc = XC.getFinalCircuit();
 
+    cout << "\nXC gate (second qubit controlled CX):\n";
     fc.print();
 };
