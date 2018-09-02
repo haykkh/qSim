@@ -80,7 +80,7 @@ _For more examples and usage, please refer to the [examples](https://github.com/
 
 ## Meta
 
-Hayk Khachatryan – hi@hayk.io
+Hayk Khachatryan – [chat w/ me](https://chat.hayk.io) – hi@hayk.io
 
 Distributed under the MIT license. See ``LICENSE`` for more information.
 
