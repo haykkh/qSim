@@ -28,48 +28,85 @@
 namespace qsim{
 namespace circuit{
 
+/*
+ *   example circuit used in comments:
+ * 
+ *   │q0>  ---|X|--------◼︎---
+ *                       │
+ *   │q1>  ----●---------│---
+ *             │         │
+ *   │q2>  ---|X|--|H|---◼︎---
+ *      
+ *             ^    ^    ^
+ *             m0   m1   m2
+ */
+
+
+
+// typedef for building blocks of circuit schematic
 typedef std::vector<std::pair<math::Matrix, std::vector<math::Ket*>>> momentScheme;
 typedef std::vector<momentScheme> schematic;
 
 class Gate {
+        /*
+     *  An object for multi qubit gates containing a 
+     *      vector of "sub gates" that make up a full gate
+     *      and a bool whether the Gate is controlled
+     * 
+     */ 
+
+
     private:
+        // bool indicating whether Gate is a controlled gate
         bool controlled = false;
+
+        /* 
+         *  vector of "sub gates"
+         * 
+         *  eg:
+         *      m0: 2 Gates: {X}, {C, X}
+         *      m1: 2 Gates: {I}, {I}, {H}
+         *      m2: 1 Gate: {C, I, Z}
+         * 
+         */ 
         std::vector<std::shared_ptr<math::Matrix>> gates;
 
     public:
         Gate(){};
 
+        // init Gate for n 'sub-gates'
         Gate(unsigned int n) {
             gates.resize(n);
         };
 
+        // init Gate with a list of 'sub-gates' and check if it's controlled
         Gate(std::initializer_list<std::shared_ptr<math::Matrix>> g) {
             gates = g;
             gateChecker();
         };
 
+        // set a 'sub-gate' in Gate to m and check if gate is controlled
         void setGate(unsigned int index, std::shared_ptr<math::Matrix> m) {
             gates[index] = m;
             gateChecker();
         };
 
+        // set entire Gate with a list of 'sub-gates' and check if gate is controlled
         void setGate(const std::vector<std::shared_ptr<math::Matrix>> g) {
             gates = g;
             gateChecker();
         };
 
+        // checks if Gate contains any controls, and subsequently updates controlled
         void gateChecker() {
             for (auto i : gates) {
                 if (i != 0) {
                     if (i -> isControlGate()) {
                         controlled = true;
-                        ranger();
                     };
                 };
             };
         }
-
-        void ranger(){};
 
         bool containsControl() {
             return controlled;
@@ -80,8 +117,41 @@ class Gate {
         };
 };
 
-math::Matrix gater(std::vector<Gate> range, std::shared_ptr<math::Matrix> C, std::shared_ptr<math::Matrix> I) {
-     math::Matrix res = {{1}};
+/*
+ *  The Magic
+ *  Creates a moment for a circuit (eg m0, m1, m2)
+ *  
+ *  iterates through range as 'i'
+ *      initialize midres
+ *      if 'i' contains a control gate,
+ *          do control magic (generalised form of this https://quantumcomputing.stackexchange.com/a/3941 )
+ *      else
+ *          apply gates in i to midres
+ * 
+ *      'add' midres to res
+ * 
+ *  return res
+ * 
+ *  eg
+ *      m0:
+ *          range = {{X}, {C, X}}
+ * 
+ *          i = {X}
+ *          gate = X
+ *          midres = X
+ * 
+ *          res = X
+ * 
+ *          i = {C, X}
+ *          gate = C
+ *          midres = C
+ *          gate = X
+ *          midres = C ⨂ X
+ *          res = X ⨂ C ⨂ X
+ * 
+ */ 
+math::Matrix momenter(std::vector<Gate> range, std::shared_ptr<math::Matrix> C, std::shared_ptr<math::Matrix> I) {
+    math::Matrix res = {{1}};
 
     for (auto i : range) {
         math::Matrix midres = {{1}};
@@ -112,17 +182,14 @@ math::Matrix gater(std::vector<Gate> range, std::shared_ptr<math::Matrix> C, std
 class Circuit
 {
     /*
-     *   example circuit used in comments:
+     *  An object containing 
+     *      qubits
+     *      a schematic of gates
+     *      a vector containing all the moments
+     *      a matrix for the entire circuit
      * 
-     *   │q0>  ---|X|--------◼︎---
-     *                       │
-     *   │q1>  ----●---------│---
-     *             │         │
-     *   │q2>  ---|X|--|H|---◼︎---
-     *      
-     *             ^    ^    ^
-     *             m0   m1   m2
-     */
+     */ 
+
 
   private:
     /* 
@@ -142,9 +209,10 @@ class Circuit
 
 
     /*
-     *    input vector of circuit
+     *   input vector of circuit
      *   eg:
-     *   { { {X, {&q0},     {CX, {&q1, &q2} } }, <- m0: first 'moment'
+     *   { 
+     *     { {X, {&q0},     {CX, {&q1, &q2} } }, <- m0: first 'moment'
      *     { {H, {&q2}                      } }, <- m1: second 'moment'
      *     { {CZ,{&q0, &q2}                 } }  <- m2: third 'moment'
      *   }
@@ -179,6 +247,7 @@ class Circuit
   public:
     Circuit(){};
 
+    // initialize Circuit with qubits and circuit schematic
     Circuit(std::vector<math::Ket *> qubs, schematic circ){
         qubits = qubs;
         circuit = circ;
@@ -186,7 +255,7 @@ class Circuit
         circuitInitializer();
     };
 
-
+    // set the qubits of the circuit
     void setQubits(const std::vector<math::Ket*> qub) {
         qubits = qub;
         n = qubits.size();
@@ -212,15 +281,19 @@ class Circuit
     // creates moments and final circuit matrix
     void circuitInitializer() {
         // matrix of a time-slice of operations within the circuit
+        // eg m0, m1, m2
         math::Matrix moment = {{1}};
         
-        // empty control gate, used later as reference
+        // control gate used later for all controls
         math::Matrix cc = (math::In(1) - gates::Z) / 2;
+
+        // set cc to be controlled
         cc.setControlGate(true);
 
+        // shared_ptr of cc, used where a pointer is required instead of actual gate
         std::shared_ptr<math::Matrix> C = std::make_shared<math::Matrix>(cc);
 
-        // identity matrix
+        // identity matrix and its shared_ptr
         math::Matrix ii = gates::I;
         std::shared_ptr<math::Matrix> I = std::make_shared<math::Matrix>(ii);
 
@@ -229,11 +302,11 @@ class Circuit
          *   a vector showing which gate is operated on which qubit
          *   eg:
          * 
-         *   for m0: range = {X, C, X}
-         *   for m1: range = {I, I, H}
-         *   for m2: range = {C, I, Z}
+         *   for m0: range = {{X}, {C, X}}
+         *   for m1: range = {{I}, {I}, {H}}
+         *   for m2: range = {{C, I, Z}}
          * 
-         *   initialised to Is
+         *   initialised to {I}s
          */
         std::vector<Gate> range(n, {I});
 
@@ -246,7 +319,7 @@ class Circuit
          */
         for (auto i : circuit) {
 
-            // reset range to all I
+            // reset range to all {I}
             range = std::vector<Gate>(n, {I});
 
 
@@ -268,9 +341,13 @@ class Circuit
              */
             for (auto j : i) {
 
-                
+                // index of first qubit worked in j
                 int minQubit = n - 1;
+
+                // index of last qubit worked in j
                 int maxQubit = 0;
+
+                // find minQubit and maxQubit
                 for (auto k : j.second) {
                     if (objectFinder(qubits, k) < minQubit) {
                         minQubit = objectFinder(qubits, k);
@@ -280,8 +357,13 @@ class Circuit
                     };
                 };
 
+                /*
+                 *  A Gate containing the 'sub-gates' in j
+                 *  to be inserted to range later on
+                 */
                 Gate midrange(maxQubit - minQubit + 1);
 
+                // a copy of qubits containing the qubits acted on in midrange
                 std::vector<math::Ket *> midrangeQubitsCopy(qubits.begin() + minQubit, qubits.begin() + maxQubit + 1);
 
                 /*
@@ -325,28 +407,51 @@ class Circuit
                     // adds buffer gate to buffers
                     buffers.push_back(buffer);
 
+                    // counter of how many {I}s were removed from range
                     int deletes = 0;
 
-                    // populates range with C for control qubits
-                    for (int q = 0; q < controlCount; q++) {
+                    /*
+                     *  populated midrange with
+                     *      C for control qubits
+                     *      shared_ptr(gate) for other gates
+                     *  removes {I}s at index of every gate/C added to midrange
+                     * 
+                     */                    
+                    for (int q = 0; q < j.second.size(); q++) {
+
+                        // index of j.second[q] qubit in qubits
                         int index = objectFinder(qubits, j.second[q]);
+
+                        // index of j.second[q] qubit in midrangeQubitsCopy
                         int midIndex = objectFinder(midrangeQubitsCopy, j.second[q]);
-                        midrange.setGate(midIndex, C);
-                        range.erase(range.begin() + index - deletes);
+
+                        // empty j.second[q] qubit reference from midrangeQubitsCopy
                         midrangeQubitsCopy[midIndex] = 0;
+                        
+
+                        if (q < controlCount) {
+                            // add control gate
+                            midrange.setGate(midIndex, C);
+                        } else {
+                            // add target gate
+                            midrange.setGate(midIndex, std::make_shared<math::Matrix>(buffers.back()));
+                        }
+
+                        // remove {I} at j.second[q] index 
+                        range.erase(range.begin() + index - deletes);
+
+                        // increment deletes
                         deletes++;
+
+
                     };
 
-                    // populates range with gate applied for target qubits
-                    for (int q = controlCount; q < j.second.size(); q++){
-                        int index = objectFinder(qubits, j.second[q]);
-                        int midIndex = objectFinder(midrangeQubitsCopy, j.second[q]);
-                        midrange.setGate(midIndex, std::make_shared<math::Matrix>(buffers.back()));
-                        range.erase(range.begin() + index - deletes);
-                        midrangeQubitsCopy[midIndex] = 0;
-                        deletes++;
-                    }
-
+                    /*
+                     *  iterates through midrangeQubitsCopy
+                     *  and adds I to remaining qubits that haven't been
+                     *  controlled or targetted
+                     * 
+                     */ 
                     for (auto q : midrangeQubitsCopy) {
                         if (q != 0) {
                             int index = objectFinder(qubits, q);
@@ -357,17 +462,14 @@ class Circuit
                         };
                     };
 
+                    // insert midrange into range at index: minQubit's 
                     range.insert(range.begin() + minQubit, midrange);
 
                 }
             };
 
-            /*
-             *  iterates through range (in reverse order)
-             *  if qubit is to be controlled, control it
-             *  if qubit is to be 'gated', gate it
-             */
-            moment = gater(range, C, I);
+            // creates moment from the created range
+            moment = momenter(range, C, I);
 
             // append moment to moments
             moments.push_back(moment);
