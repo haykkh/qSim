@@ -635,6 +635,7 @@ namespace qsim {
             return ket *= mat;
         };
 
+        typedef std::shared_ptr<Ket> Ket_ptr;
 
     }; // end namespace math
 }; // end namespace qsim
