@@ -37,7 +37,7 @@ int main() {
     // apply a Hadamard gate to qubit
     qubit *= gates::H;
 
-    std::cout << "qubit:\n";
+    std::cout << "confused qubit:\n";
     qubit.print();
 }
 ```
@@ -62,7 +62,7 @@ qubit:
 | 1 |
 | 0 |
 
-qubit:
+confused qubit:
 
 | 0.707 |
 | 0.707 |
