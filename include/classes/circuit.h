@@ -44,11 +44,12 @@ namespace circuit{
 
 
 // typedef for building blocks of circuit schematic
-typedef std::vector<std::pair<math::Matrix, std::vector<math::Ket*>>> momentScheme;
+typedef std::vector<std::pair<math::Matrix, std::vector<math::Ket_ptr>>> momentScheme;
 typedef std::vector<momentScheme> schematic;
 
+
 class Gate {
-        /*
+    /*
      *  An object for multi qubit gates containing a 
      *      vector of "sub gates" that make up a full gate
      *      and a bool whether the Gate is controlled
@@ -197,7 +198,7 @@ class Circuit
      *   eg:
      *   {&q0, &q1, &q3}
      */
-    std::vector<math::Ket *> qubits;
+    std::vector<math::Ket_ptr> qubits;
 
 
     /* 
@@ -248,7 +249,7 @@ class Circuit
     Circuit(){};
 
     // initialize Circuit with qubits and circuit schematic
-    Circuit(std::vector<math::Ket *> qubs, schematic circ){
+    Circuit(std::vector<math::Ket_ptr> qubs, schematic circ){
         qubits = qubs;
         circuit = circ;
         n = qubits.size();
@@ -256,7 +257,7 @@ class Circuit
     };
 
     // set the qubits of the circuit
-    void setQubits(const std::vector<math::Ket*> qub) {
+    void setQubits(const std::vector<math::Ket_ptr> qub) {
         qubits = qub;
         n = qubits.size();
     };
@@ -364,7 +365,7 @@ class Circuit
                 Gate midrange(maxQubit - minQubit + 1);
 
                 // a copy of qubits containing the qubits acted on in midrange
-                std::vector<math::Ket *> midrangeQubitsCopy(qubits.begin() + minQubit, qubits.begin() + maxQubit + 1);
+                std::vector<math::Ket_ptr> midrangeQubitsCopy(qubits.begin() + minQubit, qubits.begin() + maxQubit + 1);
 
                 /*
                  *  if gate operates on a different number
@@ -482,15 +483,15 @@ class Circuit
     
     
     // returns the index of a qubit in 'qubits' vector
-    int objectFinder(std::vector<math::Ket*> vec, math::Ket *q){
-        std::vector<math::Ket*>::iterator i = vec.begin();
+    int objectFinder(std::vector<math::Ket_ptr> vec, math::Ket_ptr q){
+        std::vector<math::Ket_ptr>::iterator i = vec.begin();
         i = find (vec.begin(), vec.end(), q);
         int b = distance (vec.begin (), i);
         return b;
     };
     
     // checks whether qubits input are adjacent
-    bool adjacent(std::vector<math::Ket *> qub){
+    bool adjacent(std::vector<math::Ket_ptr> qub){
         for (int i = 0; i < qub.size() - 1; i++) {
             // if the distance between qub[i] and qub[i+1] isn't 1 they are not adjacent
             if (std::abs(objectFinder(qubits, qub[i]) - objectFinder(qubits, qub[i+1])) != 1) {
@@ -501,12 +502,12 @@ class Circuit
     };
 
 
-    std::vector<math::Ket*> getQubits() const {
+    std::vector<math::Ket_ptr> getQubits() const {
         return qubits;
     };
 
 
-    std::vector<std::vector<std::pair<math::Matrix, std::vector<math::Ket*>>>> getCircuit() const {
+    std::vector<std::vector<std::pair<math::Matrix, std::vector<math::Ket_ptr>>>> getCircuit() const {
         return circuit;
     };
 
