@@ -8,8 +8,8 @@ int main() {
     Ket k0 = states::z0;
     Ket k1 = states::z0;
 
-    Ket* q0 = &k0;
-    Ket* q1 = &k1;
+    Ket_ptr q0 = make_shared<Ket>(k0);
+    Ket_ptr q1 = make_shared<Ket>(k1);
 
     Matrix CX = gates::CX;
     Matrix H = gates::H;

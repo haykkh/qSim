@@ -9,11 +9,11 @@ int main() {
     Ket k1 = states::z0;
     Ket k2 = states::z0;
 
-    Ket* q0 = &k0;
-    Ket* q1 = &k1;
-    Ket* q2 = &k2;
+    Ket_ptr q0 = make_shared<Ket>(k0);
+    Ket_ptr q1 = make_shared<Ket>(k1);
+    Ket_ptr q2 = make_shared<Ket>(k2);
 
-    vector<Ket*> qubits = {q0, q1, q2};
+    vector<Ket_ptr> qubits = {q0, q1, q2};
 
     Matrix H = gates::H;
 

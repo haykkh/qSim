@@ -9,8 +9,8 @@ int main () {
     Ket b = states::z0;
     Ket b00 = states::b00;
 
-    Ket* A = &a;
-    Ket* B = &b;
+    Ket_ptr A = make_shared<Ket>(a);
+    Ket_ptr B = make_shared<Ket>(b);
 
     Matrix H = gates::H;
     Matrix CX = gates::CX;
