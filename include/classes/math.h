@@ -28,9 +28,6 @@
 namespace qsim {
     namespace math {
 
-
-
-
         extern const std::complex<double> I(0,1);
         extern const double pi = std::atan(1) * 4;
 
@@ -87,6 +84,8 @@ namespace qsim {
 
                 void setData(std::vector<std::vector<std::complex<double>>> d) {
                     data = d;
+                    ySize = data.size();
+                    xSize = data[0].size();
                 };
 
                 void setGateControlled(const Matrix_ptr mat)
