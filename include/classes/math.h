@@ -28,6 +28,9 @@
 namespace qsim {
     namespace math {
 
+
+
+
         extern const std::complex<double> I(0,1);
         extern const double pi = std::atan(1) * 4;
 
@@ -46,7 +49,8 @@ namespace qsim {
                 std::vector<std::complex<double>>::size_type xSize;
                 bool control = false;
                 bool controlledGate = false;
-                const Matrix* gateControlled;
+                typedef std::shared_ptr<Matrix> Matrix_ptr;
+                Matrix_ptr gateControlled;
                 
             public:
 
@@ -85,7 +89,7 @@ namespace qsim {
                     data = d;
                 };
 
-                void setGateControlled(const Matrix* mat)
+                void setGateControlled(const Matrix_ptr mat)
                 {
                     gateControlled = mat;
                 };
@@ -136,7 +140,7 @@ namespace qsim {
                             res.setValue(ySize + j, xSize + i, getValue(j, i));
                         };
                     };
-                    res.setGateControlled(this);
+                    res.setGateControlled(std::make_shared<Matrix>(*this));
                     res.setControlled(true);
                     return res;
                 };
@@ -636,6 +640,7 @@ namespace qsim {
         };
 
         typedef std::shared_ptr<Ket> Ket_ptr;
+        typedef std::shared_ptr<Matrix> Matrix_ptr;
 
     }; // end namespace math
 }; // end namespace qsim
