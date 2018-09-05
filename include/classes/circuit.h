@@ -298,6 +298,9 @@ class Circuit
         math::Matrix ii = gates::I;
         std::shared_ptr<math::Matrix> I = std::make_shared<math::Matrix>(ii);
 
+        math::Matrix null = {{1}};
+
+
         /*
          *   a vector showing which qubits are operated on
          *   a vector showing which gate is operated on which qubit
@@ -311,6 +314,8 @@ class Circuit
          */
         std::vector<Gate> range(n, {I});
 
+
+    
 
 
 
@@ -334,7 +339,7 @@ class Circuit
              *  for CX, X would be added to buffers 
              *  for CCY, Y would be added to buffers
              */
-            std::vector<const math::Matrix> buffers;
+            std::vector<math::Matrix> buffers;
             
             /* 
              *  j of format:
@@ -409,7 +414,7 @@ class Circuit
                     buffers.push_back(buffer);
 
                     // counter of how many {I}s were removed from range
-                    int deletes = 0;
+                    std::vector<int> deletes(n, 0);
 
                     /*
                      *  populated midrange with
@@ -436,13 +441,16 @@ class Circuit
                         } else {
                             // add target gate
                             midrange.setGate(midIndex, std::make_shared<math::Matrix>(buffers.back()));
-                        }
+                            buffers.back().setData({{1}});
+                        };
+
+                        int deletedTillNow = std::count(deletes.begin(), deletes.begin() + index, 1);
 
                         // remove {I} at j.second[q] index 
-                        range.erase(range.begin() + index - deletes);
+                        range.erase(range.begin() + index - deletedTillNow);
 
                         // increment deletes
-                        deletes++;
+                        deletes[index] = 1;
 
 
                     };
@@ -458,8 +466,9 @@ class Circuit
                             int index = objectFinder(qubits, q);
                             int midIndex = objectFinder(midrangeQubitsCopy, q);
                             midrange.setGate(midIndex, I);
-                            range.erase(range.begin() + index - deletes);
-                            deletes++;
+                            int deletedTillNow = std::count(deletes.begin(), deletes.begin() + index, 1);
+                            range.erase(range.begin() + index - deletedTillNow);
+                            deletes[index] = 1;
                         };
                     };
 
