@@ -413,7 +413,7 @@ class Circuit
                     // adds buffer gate to buffers
                     buffers.push_back(buffer);
 
-                    // counter of how many {I}s were removed from range
+                    // shows which qubit has been deleted from range
                     std::vector<int> deletes(n, 0);
 
                     /*
@@ -444,12 +444,13 @@ class Circuit
                             buffers.back().setData({{1}});
                         };
 
+                        // counts how many qubits up to index have been deleted from range
                         int deletedTillNow = std::count(deletes.begin(), deletes.begin() + index, 1);
 
                         // remove {I} at j.second[q] index 
                         range.erase(range.begin() + index - deletedTillNow);
 
-                        // increment deletes
+                        // sets index of qubit as '1' in deletes
                         deletes[index] = 1;
 
 
@@ -463,11 +464,23 @@ class Circuit
                      */ 
                     for (auto q : midrangeQubitsCopy) {
                         if (q != 0) {
+                            
+                            // index of j.second[q] qubit in qubits
                             int index = objectFinder(qubits, q);
+                            
+                            // index of j.second[q] qubit in midrangeQubitsCopy
                             int midIndex = objectFinder(midrangeQubitsCopy, q);
+                            
+                            // add I to midrange
                             midrange.setGate(midIndex, I);
+
+                            // counts how many qubits up to index have been deleted from range
                             int deletedTillNow = std::count(deletes.begin(), deletes.begin() + index, 1);
+
+                            // remove {I} at j.second[q] index
                             range.erase(range.begin() + index - deletedTillNow);
+                            
+                            // sets index of qubit as '1' in deletes
                             deletes[index] = 1;
                         };
                     };
