@@ -14,11 +14,11 @@ int main() {
     Matrix CX = gates::CX;
     Matrix H = gates::H;
 
-    circuit::Circuit XC;
+    circuit::Circuit XC1;
 
-    XC.setQubits({q0, q1});
+    XC1.setQubits({q0, q1});
 
-    XC.setCircuit({
+    XC1.setCircuit({
                     {
                         {H, {q0}}, {H, {q1}}
                     },
@@ -31,8 +31,23 @@ int main() {
                     }
     });
 
-    Matrix fc = XC.getFinalCircuit();
+    Matrix fc1 = XC1.getFinalCircuit();
 
-    cout << "\nXC gate (second qubit controlled CX):\n";
-    fc.print();
+    circuit::Circuit XC2;
+
+    XC2.setQubits({q0, q1});
+
+    XC2.setCircuit({
+        {
+            {CX, {q1, q0}}
+        }
+    });
+
+    Matrix fc2 = XC2.getFinalCircuit();
+
+    cout << "\nXC1 gate (second qubit controlled CX):\n";
+    fc1.print();
+
+    cout << "\nXC2 gate (second qubit controlled CX):\n";
+    fc2.print();
 };
