@@ -327,7 +327,9 @@ class Circuit
 
             // reset range to all {I}
             range = std::vector<Gate>(n, {I});
-
+            
+            // shows which qubit has been deleted from range
+            std::vector<int> deletes(n, 0);
 
             //reset moment
             moment = {{1}};
@@ -413,9 +415,6 @@ class Circuit
                     // adds buffer gate to buffers
                     buffers.push_back(buffer);
 
-                    // shows which qubit has been deleted from range
-                    std::vector<int> deletes(n, 0);
-
                     /*
                      *  populated midrange with
                      *      C for control qubits
@@ -485,8 +484,12 @@ class Circuit
                         };
                     };
 
+                    // counts how many qubits up to index have been deleted from range
+                    int deletedTillNow = std::count(deletes.begin(), deletes.begin() + minQubit, 1);
+
                     // insert midrange into range at index: minQubit's 
-                    range.insert(range.begin() + minQubit, midrange);
+                    range.insert(range.begin() + minQubit - deletedTillNow, midrange);
+                    deletes[minQubit] = 0;
 
                 }
             };
