@@ -411,6 +411,7 @@ namespace qsim {
             private:
                 std::vector<std::complex<double>> data;
                 std::vector<std::complex<double>>::size_type size;
+                std::vector<int> state;
 
             public:
                 Ket(){
@@ -437,6 +438,42 @@ namespace qsim {
                     data[index] = value;
                 }
 
+                void push_back(std::complex<double> value) {
+                    data.insert(data.end(), value);
+                };
+
+                void initState() {
+                    int index = distance(data.begin(), find(data.begin(), data.end(), 1.0)) + 1;
+                    
+                    int size = getSize();
+                    state.clear();
+
+                    while (size > 1) {
+                        if (index > size / 2) {
+                            index -= size / 2;
+                            state.push_back(1);
+                        } else {
+                            state.push_back(0);
+                        };
+
+                        size /= 2;
+                    };
+                };
+
+                std::vector<int> getState() {
+                    initState();
+
+                    return state;
+                };
+
+                void printState() {
+                    std::cout << std::endl;
+                    for (auto i : state) {
+                        std::cout << i;
+                    };
+                    std::cout << std::endl;
+                };
+
 
                 std::complex<double> getValue(unsigned int index) const {
                     return data[index];
@@ -449,6 +486,7 @@ namespace qsim {
                 std::vector<std::complex<double>>::size_type getSize() const {
                     return size;
                 };
+
 
                 void measure(){
                     std::vector<double> p;
