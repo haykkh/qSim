@@ -44,11 +44,15 @@ namespace gates {
     extern const math::Matrix Z = { {1,  0}, 
                                     {0, -1} };
             
-    // the rest
+    // Phase 
     extern const math::Matrix S = { {1,       0},
                                     {0, math::I} };
+
+    // T (π/8)
     extern const math::Matrix T = { {1,                                0},
                                     {0, std::exp(math::I * math::pi * 0.25)} };
+
+    // Hadamard
     extern const math::Matrix H = { {1 / sqrt(2),   1 / sqrt(2)},
                                     {1 / sqrt(2), - 1 / sqrt(2)} };
     /*********************/
