@@ -80,3 +80,8 @@ Temporary Items
 
 #ai files
 */*.ai
+
+
+# test files
+
+test/*
