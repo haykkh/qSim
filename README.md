@@ -69,7 +69,7 @@ confused qubit:
 
 ```
 
-_For more examples and usage, please refer to the [examples](https://github.com/haykkh/qSim-cpp/examples)._
+_For more examples and usage, please refer to the [examples](https://github.com/haykkh/qSim-cpp/tree/master/examples)._
 
 
 
