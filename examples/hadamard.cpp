@@ -1,3 +1,7 @@
+/*
+ *  An example of an Hadamard transform circuit on 3 qubits
+ */ 
+
 #include "../include/qSim.h"
 
 using namespace std;

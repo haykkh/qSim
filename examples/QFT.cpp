@@ -1,3 +1,10 @@
+/*
+ *  An Example of Quantum Fourier Transforms of various sizes
+ */ 
+
+
+
+
 #include "../include/qSim.h"
 
 using namespace std;

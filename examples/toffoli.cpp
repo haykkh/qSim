@@ -1,3 +1,9 @@
+/*
+ *  An example of a circuit for the Toffoli (CCNOT) gate
+ */  
+
+
+
 #include "../include/qSim.h"
 
 using namespace qsim;

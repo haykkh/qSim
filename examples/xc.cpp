@@ -1,3 +1,6 @@
+/*
+ *  An example of various ways to have index of control qubit after index of qubit being controlled
+ */
 #include "../include/qSim.h"
 
 using namespace std;

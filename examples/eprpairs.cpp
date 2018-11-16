@@ -1,3 +1,7 @@
+/*
+ *  An example of entangled EPR pairs in a shared Bell state
+ */ 
+
 #include "../include/qSim.h"
 
 using namespace qsim;
