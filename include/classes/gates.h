@@ -60,22 +60,30 @@ namespace gates {
                                        {0, 0, 1, 0},
                                        {0, 1, 0, 0},
                                        {0, 0, 0, 1} };
+
+    // Controlled X/Z/S
     extern const math::Matrix CX = X.controlled();
     extern const math::Matrix CZ = Z.controlled();
     extern const math::Matrix CS = S.controlled();
 
-
+    // Toffoli (double controlled X)
     extern const math::Matrix CCNOT = X.controlled().controlled();
+
+    // Controlled SWAP
     extern const math::Matrix CSWAP = SWAP.controlled();
 
+
+    // Phase gate with phase = math::omega(k)
     math::Matrix R(double k) {
         return {{1, 0}, {0, math::omega(k)}};
     };
 
+    // Phase gate with phase = phi
     math::Matrix phaseShift(double phi) {
         return {{1, 0}, {0, std::exp(math::I * phi)}};
     };
 
+    // Quantum fourier transform gate of size 2^n x 2^n
     math::Matrix QFT(int N) {
         int n = std::log(N) / std::log(2);
         std::complex<double> om = math::omega(n);
