@@ -1,5 +1,5 @@
 # qSim-cpp
-> Quantum computer simulator
+> Quantum computer simulator library
 
 ![](img/atom.png)
 
