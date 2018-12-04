@@ -20,7 +20,7 @@ Our system, __|AB>__ starts off in state
 <img src="img/epr/starting.jpg" height="167" width="575">
 
 And after the circuit is in state __|Φ⁺>__, or __b00__ in qSim
-<img src="img/epr/b00.jpg" height="185" width="1093">
+<img src="img/epr/b00.jpg" height="410" width="678">
 
 __|Φ⁺>__ is an equally weighted superposition of __|00>__ and __|11>__, so after measurement you get __|00>__ 50% of the time and __|11>__ the other 50%
 <img src="img/epr/measurement.jpg" height="195" width="422">
