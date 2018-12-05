@@ -12,6 +12,8 @@ Demonstrates the creation of the shared state using two methods:
 * Calling the preset value of __b00__ from ```states.h```
 * Creating a circuit that entangles two qubits into a shared Bell state, __b00__
 
+See [here](https://en.wikipedia.org/wiki/Bell_state) for more info
+
 ### Method
 
 We have two qubits, __|A>__ and __|B>__, both in state __|0>__
