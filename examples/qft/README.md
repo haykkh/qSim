@@ -10,11 +10,15 @@ For a system of 2 qubits, our circuit is
 <p><img src="../img/QFT/2.jpg" height="228" width="669"></p>
 
 ```cpp
+// c++
+
 cout << "2 qubit QFT matrix:\n\n";
 Matrix twoQFT = gates::QFT(4);
 twoQFT.print();
 ```
 ```sh
+# sh
+
 2 qubit QFT matrix:
 
 | 0.5   0.5    0.5   0.5  |
@@ -27,11 +31,15 @@ For a system of 3 qubits
 <p><img src="../img/QFT/3.jpg" height="260" width="721"></p>
 
 ```cpp
+// c++
+
 cout << "\n3 qubit QFT matrix:\n\n";
 Matrix threeQFT = gates::QFT(8);
 threeQFT.print();
 ```
 ```sh
+# sh
+
 3 qubit QFT matrix:
 
 | 0.354        0.354       0.354         0.354       0.354       0.354        0.354         0.354      |
