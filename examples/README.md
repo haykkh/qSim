@@ -1,5 +1,5 @@
 # Examples
 
-* [eprpairs.cpp](/eprpairs)
-* [hadamard.cpp](/hadamard)
-* [QFT.cpp](/qft)
+* [eprpairs.cpp](https://github.com/haykkh/qSim-cpp/tree/master/examples/eprpairs)
+* [hadamard.cpp](https://github.com/haykkh/qSim-cpp/tree/master/examples/hadamard)
+* [QFT.cpp](https://github.com/haykkh/qSim-cpp/tree/master/examples/qft)
