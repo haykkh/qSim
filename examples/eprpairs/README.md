@@ -14,7 +14,7 @@ We have two qubits, __|A>__ and __|B>__, both in state __|0>__
 <p><img src="../img/epr/qubits.jpg" height="84" width="434"></p>
 
 ```cpp
-//c++
+// c++
 
 Ket a = states::z0;
 Ket b = states::z0;
@@ -27,7 +27,7 @@ Our system, __|AB>__, starts off in state __|00>__
 <p><img src="../img/epr/starting.jpg" height="211" width="672"></p>
 
 ```cpp
-//c++
+// c++
 
 Ket ab = a * b;
 

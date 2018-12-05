@@ -27,6 +27,7 @@ Our system, __|k0k1k2>__, starts off in state __|001>__
 
 ```cpp
 // c++
+
 Ket state = k0 * k1 * k2;
 
 cout << "\nSystem starting state:\n";
