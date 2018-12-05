@@ -7,13 +7,13 @@ See [here](https://en.wikipedia.org/wiki/Quantum_Fourier_transform) for more inf
 ## Method
 
 For a system of 2 qubits, our circuit is
-<p><img src="img/QFT/2.jpg" height="228" width="669"></p>
+<p><img src="../img/QFT/2.jpg" height="228" width="669"></p>
 
 For a system of 3 qubits
-<p><img src="img/QFT/3.jpg" height="260" width="721"></p>
+<p><img src="../img/QFT/3.jpg" height="260" width="721"></p>
 
 Where Rn is a controlled [phase gate](https://en.wikipedia.org/wiki/Quantum_gate#Phase_shift_gates)
-<p><img src="img/QFT/R.jpg" height="327" width="503"></p>
+<p><img src="../img/QFT/R.jpg" height="327" width="503"></p>
 
 ```sh
 $ ./qft
