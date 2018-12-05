@@ -11,7 +11,7 @@ using namespace math;
 int main() {
     Ket k0 = states::z0;
     Ket k1 = states::z0;
-    Ket k2 = states::z0;
+    Ket k2 = states::z1;
 
     Ket_ptr q0 = make_shared<Ket>(k0);
     Ket_ptr q1 = make_shared<Ket>(k1);
