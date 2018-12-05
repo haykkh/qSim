@@ -29,13 +29,13 @@ __|Φ⁺>__ is an equally weighted superposition of __|00>__ and __|11>__, so af
 <p><img src="img/epr/measurement.jpg" height="172" width="702"></p>
 
 ```sh
-$ ./eprpairs.out
+$ ./eprpairs
 
 Circuit Matrix:
-| 0.707  0       0.707   0     |
-| 0      0.707   0       0.707 |
-| 0      0.707   0      -0.707 |
-| 0.707  0      -0.707   0     |
+| 0.707  0      0.707  0     |
+| 0      0.707  0      0.707 |
+| 0      0.707  0     -0.707 |
+| 0.707  0     -0.707  0     |
 
 
 System starting state:
@@ -46,7 +46,7 @@ System starting state:
 | 0 |
 
 
-Our result is:
+Result from circuit:
 
 | 0.707 |
 | 0     |
@@ -54,7 +54,7 @@ Our result is:
 | 0.707 |
 
 
-The true result is:
+Recalled variable result:
 
 | 0.707 |
 | 0     |
