@@ -35,7 +35,7 @@ cout << "\nSystem starting state:\n";
 ab.print();
 ```
 ```sh
-$ 
+# sh
 
 System starting state:
 
@@ -71,7 +71,7 @@ fc.print();
 ```
 
 ```sh
-$ 
+# sh
 
 Circuit Matrix:
 | 0.707  0      0.707  0     |
@@ -97,7 +97,7 @@ cout << "\nRecalled variable result:\n";
 b00.print();
 ```
 ```sh
-$ 
+# sh 
 
 Result from circuit:
 
