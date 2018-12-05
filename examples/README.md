@@ -1,7 +1,7 @@
 # Examples
 
-[eprpairs.cpp](#eprpairscpp)
-[hadamard.cpp](#hadamardcpp)
+* [eprpairs.cpp](#eprpairscpp)
+* [hadamard.cpp](#hadamardcpp)
 
 
 ## eprpairs.cpp
@@ -73,11 +73,9 @@ State after measurement:
 
 ## hadamard.cpp
 
-A simple pair of entangled qubits in a shared Bell state
+Applies an Hadamard transform to 3 qubits
 
-Demonstrates the creation of the shared state using two methods:
-* Calling the preset value of __b00__ from ```states.h```
-* Creating a circuit that entangles two qubits into a shared Bell state, __b00__
+See [here](https://en.wikipedia.org/wiki/Hadamard_transform) for more info
 
 ### Method
 
