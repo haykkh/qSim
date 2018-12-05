@@ -2,7 +2,7 @@
  *  An example of entangled EPR pairs in a shared Bell state
  */ 
 
-#include "../include/qSim.h"
+#include "../../include/qSim.h"
 
 using namespace qsim;
 using namespace math;
@@ -38,23 +38,23 @@ int main () {
     cout << "\nCircuit Matrix:\n";
     fc.print();
 
-    Ket c = a * b;
+    Ket ab = a * b;
 
     cout << "\nSystem starting state:\n";
-    c.print();
+    ab.print();
 
-    c *= fc;
+    ab *= fc;
 
     cout << "\nResult from circuit:\n";
-    c.print();
+    ab.print();
 
     cout << "\nRecalled variable result:\n";
     b00.print();
 
-    c.measure();
-    cout << "\nState after measurement:\n";
+    ab.measure();
 
-    c.print();
+    cout << "\nState after measurement:\n";
+    ab.print();
 
 
 }
