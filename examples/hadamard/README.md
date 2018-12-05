@@ -96,6 +96,7 @@ Circuit matrix:
 
 This circuit puts the system puts into equally weighted superposition of __|000>__, __|001>__, __|010>__, __|011>__, __|100>__, __|101>__, __|110>__, and __|111>__
 <p><img src="../img/hadamard/after.jpg" height="314" width="769"></p>
+
 ```cpp
 // c++
 
