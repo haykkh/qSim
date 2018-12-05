@@ -120,6 +120,7 @@ State after measurement:
 | 1 |
 ```
 
+## Sample run
 ```sh
 $ ./eprpairs
 
