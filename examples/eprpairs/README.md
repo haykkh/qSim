@@ -14,6 +14,8 @@ We have two qubits, __|A>__ and __|B>__, both in state __|0>__
 <p><img src="../img/epr/qubits.jpg" height="84" width="434"></p>
 
 ```cpp
+//c++
+
 Ket a = states::z0;
 Ket b = states::z0;
 
@@ -25,12 +27,16 @@ Our system, __|AB>__, starts off in state __|00>__
 <p><img src="../img/epr/starting.jpg" height="211" width="672"></p>
 
 ```cpp
+//c++
+
 Ket ab = a * b;
 
 cout << "\nSystem starting state:\n";
 ab.print();
 ```
 ```sh
+$ 
+
 System starting state:
 
 | 1 |
@@ -43,6 +49,8 @@ We create a circuit that will entangle __|A>__ and __|B>__. First an Hadamard tr
 <p><img src="../img/epr/circuit.jpg" height="236" width="729"> </p>
 
 ```cpp
+// c++
+
 circuit::Circuit bell;
 
 bell.setQubits({A, B});
@@ -63,6 +71,8 @@ fc.print();
 ```
 
 ```sh
+$ 
+
 Circuit Matrix:
 | 0.707  0      0.707  0     |
 | 0      0.707  0      0.707 |
@@ -74,6 +84,8 @@ After the circuit, our system is in state __|Φ⁺>__, or __b00__ in qSim
 <p><img src="../img/epr/b00.jpg" height="402" width="571"></p>
 
 ```cpp
+// c++
+
 ab *= fc;
 
 cout << "\nResult from circuit:\n";
@@ -85,6 +97,8 @@ cout << "\nRecalled variable result:\n";
 b00.print();
 ```
 ```sh
+$ 
+
 Result from circuit:
 
 | 0.707 |
