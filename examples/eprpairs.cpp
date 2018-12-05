@@ -45,10 +45,10 @@ int main () {
 
     c *= fc;
 
-    cout << "\nOur result is:\n";
+    cout << "\nResult from circuit:\n";
     c.print();
 
-    cout << "\nThe true result is:\n";
+    cout << "\nRecalled variable result:\n";
     b00.print();
 
     c.measure();
