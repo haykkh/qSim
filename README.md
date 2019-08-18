@@ -1,10 +1,7 @@
 # qSim-cpp
 
-<<<<<<< HEAD
-=======
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/964dabd527814bf189a8f60ee21aa807)](https://app.codacy.com/app/haykkh/qSim?utm_source=github.com&utm_medium=referral&utm_content=haykkh/qSim&utm_campaign=Badge_Grade_Dashboard)
 
->>>>>>> 1f61237383ee344a34d9198250996e13b72f5beb
 > Quantum computer simulator library
 
 ![](img/atom.png)
