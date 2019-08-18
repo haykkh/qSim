@@ -7,6 +7,7 @@ See [here](https://en.wikipedia.org/wiki/Quantum_Fourier_transform) for more inf
 ## Method
 
 For a system of 2 qubits, our circuit is
+
 <p><img src="../img/QFT/2.jpg" height="228" width="669"></p>
 
 ```cpp
@@ -16,6 +17,7 @@ cout << "2 qubit QFT matrix:\n\n";
 Matrix twoQFT = gates::QFT(4);
 twoQFT.print();
 ```
+
 ```sh
 # sh
 
@@ -28,6 +30,7 @@ twoQFT.print();
 ```
 
 For a system of 3 qubits
+
 <p><img src="../img/QFT/3.jpg" height="260" width="721"></p>
 
 ```cpp
@@ -37,6 +40,7 @@ cout << "\n3 qubit QFT matrix:\n\n";
 Matrix threeQFT = gates::QFT(8);
 threeQFT.print();
 ```
+
 ```sh
 # sh
 
@@ -53,8 +57,8 @@ threeQFT.print();
 ```
 
 Where Rn is a controlled [phase gate](https://en.wikipedia.org/wiki/Quantum_gate#Phase_shift_gates)
-<p><img src="../img/QFT/R.jpg" height="327" width="503"></p>
 
+<p><img src="../img/QFT/R.jpg" height="327" width="503"></p>
 
 ## Sample run
 

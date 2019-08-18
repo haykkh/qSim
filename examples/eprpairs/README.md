@@ -3,18 +3,20 @@
 A simple pair of entangled qubits in a shared Bell state
 
 Demonstrates the creation of the shared state using two methods:
-* Calling the preset value of __b00__ from ```states.h```
-* Creating a circuit that entangles two qubits into a shared Bell state, __b00__
+
+-   Calling the preset value of **b00** from `states.h`
+-   Creating a circuit that entangles two qubits into a shared Bell state, **b00**
 
 See [here](https://en.wikipedia.org/wiki/Bell_state) for more info
 
 ## Method
 
-We have two qubits, __|A>__ and __|B>__, both in state __|0>__
+We have two qubits, **|A>** and **|B>**, both in state **|0>**
+
 <p><img src="../img/epr/qubits.jpg" height="84" width="434"></p>
 
 ```cpp
-//c++
+// c++
 
 Ket a = states::z0;
 Ket b = states::z0;
@@ -23,17 +25,19 @@ Ket_ptr A = make_shared<Ket>(a);
 Ket_ptr B = make_shared<Ket>(b);
 ```
 
-Our system, __|AB>__, starts off in state __|00>__
+Our system, **|AB>**, starts off in state **|00>**
+
 <p><img src="../img/epr/starting.jpg" height="211" width="672"></p>
 
 ```cpp
-//c++
+// c++
 
 Ket ab = a * b;
 
 cout << "\nSystem starting state:\n";
 ab.print();
 ```
+
 ```sh
 # sh
 
@@ -45,7 +49,8 @@ System starting state:
 | 0 |
 ```
 
-We create a circuit that will entangle __|A>__ and __|B>__. First an Hadamard transform puts __|A>__ into an equally weighted superposition of __|0>__ and __|1>__, then __|A>__ acts asthe control qubit for a NOT gate applied to __|B>__. This circuit is equivalent to the matrix printed below
+We create a circuit that will entangle **|A>** and **|B>**. First an Hadamard transform puts **|A>** into an equally weighted superposition of **|0>** and **|1>**, then **|A>** acts asthe control qubit for a NOT gate applied to **|B>**. This circuit is equivalent to the matrix printed below
+
 <p><img src="../img/epr/circuit.jpg" height="236" width="729"> </p>
 
 ```cpp
@@ -80,7 +85,8 @@ Circuit Matrix:
 | 0.707  0     -0.707  0     |
 ```
 
-After the circuit, our system is in state __|Φ⁺>__, or __b00__ in qSim
+After the circuit, our system is in state **|Φ⁺>**, or **b00** in qSim
+
 <p><img src="../img/epr/b00.jpg" height="402" width="571"></p>
 
 ```cpp
@@ -96,6 +102,7 @@ Ket b00 = states::b00;
 cout << "\nRecalled variable result:\n";    
 b00.print();
 ```
+
 ```sh
 # sh 
 
@@ -115,8 +122,8 @@ Recalled variable result:
 | 0.707 |
 ```
 
+**|Φ⁺>** is an equally weighted superposition of **|00>** and **|11>**, so after measurement you get **|00>** or **|11>** with a probability of 0.5
 
-__|Φ⁺>__ is an equally weighted superposition of __|00>__ and __|11>__, so after measurement you get __|00>__ or __|11>__ with a probability of 0.5
 <p><img src="../img/epr/measurement.jpg" height="172" width="702"></p>
 
 ```cpp
@@ -125,6 +132,7 @@ ab.measure();
 cout << "\nState after measurement:\n";
 ab.print();
 ```
+
 ```sh
 State after measurement:
 
@@ -135,6 +143,7 @@ State after measurement:
 ```
 
 ## Sample run
+
 ```sh
 $ ./eprpairs
 
