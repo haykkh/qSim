@@ -49,7 +49,7 @@ System starting state:
 | 0 |
 ```
 
-We create a circuit that will entangle **|A>** and **|B>**. First an Hadamard transform puts **|A>** into an equally weighted superposition of **|0>** and **|1>**, then **|A>** acts asthe control qubit for a NOT gate applied to **|B>**. This circuit is equivalent to the matrix printed below
+We create a circuit that will entangle **|A>** and **|B>**. First an Hadamard transform puts **|A>** into an equally weighted superposition of **|0>** and **|1>**, then **|A>** acts as the control qubit for a NOT gate applied to **|B>**. This circuit is equivalent to the matrix printed below
 
 <p><img src="../img/epr/circuit.jpg" height="236" width="729"> </p>
 
